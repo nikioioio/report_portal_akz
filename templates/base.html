@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static "app.css" %}">
+    <script type="text/javascript" src="{% static "jquery-3.6.0.js" %}"></script>
+
+    {% block css_files %}{% endblock %}
+
+</head>
+<body>
+<div class="main__contaner">
+
+
+    <header class="header">
+        <div class="container">
+            <div class="header_inner">
+                <div class="header_logo">{{ title }}</div>
+                <nav class="nav">
+                    <a class="nav__link" href="{% url "starting-page"%}">Home</a>
+                    {#                    <a class="nav__link" href="">Отчет по маржинальности</a>#}
+                    {#                    <a class="nav__link" href="">BLog</a>#}
+                    {#                    <a class="nav__link" href="">Work</a>#}
+                    {#                    <a class="nav__link" href="">Contact</a>#}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="intro">
+        <div class="container">
+
+            <div class="intro__inner">
+                {% block content %}
+
+{#                    <ul class="border">#}
+{#                        <li><a class="nav__link" a href="{% url "starting-page-margin"%}">Отчет по маржинальности</a></li>#}
+{#                        <li><a class="nav__link" a href="">Отчет2</a></li>#}
+{#                        <li><a class="nav__link" a href="">Отчет3</a></li>#}
+{#                        <li><a class="nav__link" a href="">Отчет4</a></li>#}
+{#                        <li><a class="nav__link" a href="">Отчет5</a></li>#}
+{#                    </ul>#}
+
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+
+</html>
+
+
