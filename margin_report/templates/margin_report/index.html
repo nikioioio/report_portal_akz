@@ -1,4 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "margin_report/main.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <ol class="bullet">
+        <li>Выбор директории исходных файлов: <input type="file"  id="ctrl" webkitdirectory directory multiple/></li>
+        <li>Выбор месяца по который ормируем отчет: <input type="number"></li>
+        <li>Элемент списка</li>
+        <li>Элемент списка</li>
+        <li>Элемент списка</li>
+    </ol>
+
+
+    <button class="border-button" onclick="get_val()">Получить отчет</button>
+
+
+
+
+    <script type="text/javascript" src="{% static "./margin_report/js/main.js" %}"></script>
+{% endblock %}
+
 
 
 
