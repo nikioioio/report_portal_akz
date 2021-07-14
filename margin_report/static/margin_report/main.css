@@ -7,6 +7,7 @@ input {
     background: #F6F6f6;
     border-radius: 8px;
     margin: 5px;
+    width: 100%;
 }
 
 /*.wrapper {*/
