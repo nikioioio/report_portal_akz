@@ -1,13 +1,13 @@
 function get_val() {
 
-    // if ($('#month_').val()==''){
-    //     alert('Введите месяц!!!')
-    //     return
-    // }
-    // if ($('#year_').val()==''){
-    //     alert('Введите год!!!')
-    //     return
-    // }
+    if ($('#month_').val()==''){
+        alert('Введите месяц!!!')
+        return
+    }
+    if ($('#year_').val()==''){
+        alert('Введите год!!!')
+        return
+    }
 
 
 
@@ -72,11 +72,13 @@ function get_val() {
     xhr.open('POST', 'upl/');
     // xhr.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     xhr.responseType = 'arraybuffer';
-    $('.cssload-dots').css('display','block')
+    $('#circularG').css({'display':'block'})
+    $('#btn_send').attr('disabled',true)
 
     xhr.onload = function (e) {
 
-        $('.cssload-dots').css('display','none')
+        $('#circularG').css({'display':'none'})
+        $('#btn_send').removeAttr('disabled')
         if (this.status == 200) {
             let disposition = this.getResponseHeader('Content-Disposition')
 
