@@ -36,7 +36,17 @@ def upload_files(request):
 
             global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
 
-            prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(file_factory=df_mpf,file_mapping=df_mapping,file_coef_cenn=df_koef_cen,file_ost_nach_g=df_ost_mpf,mon=int(month_),global_index=global_index,filename='МПФ',year_report=int(year_))
+            prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(file_factory=df_mpf,file_mapping=df_mapping,
+                                                                 file_coef_cenn=df_koef_cen,
+                                                                 file_ost_nach_g=df_ost_mpf,mon=int(month_),
+                                                                 global_index=global_index,filename='МПФ',
+                                                                 year_report=int(year_))
+            
+            prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(file_factory=df_ukpf, file_mapping=df_mapping,
+                                                                    file_coef_cenn=df_koef_cen,
+                                                                    file_ost_nach_g=df_ost_ukpf, mon=int(month_),
+                                                                    global_index=global_index, filename='УКПФ',
+                                                                    year_report=int(year_))
 
 
             # df1 = pd.DataFrame({'hhhh':[1,2,3]})
@@ -45,7 +55,7 @@ def upload_files(request):
             # Возврат на frontend файла excel
             writer = pd.ExcelWriter(output, engine='xlsxwriter')
             ost_MPF.to_excel(writer, sheet_name='Sheet1')
-            # df1.to_excel(writer, sheet_name='Sheet2')
+            ost_UKPF.to_excel(writer, sheet_name='Sheet2')
             writer.save()
 
             output.seek(0)
