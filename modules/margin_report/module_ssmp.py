@@ -7,28 +7,53 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, mon, global_index,filename,year_report):
+# def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, mon, global_index,filename,year_report): #первоначальный вариант
+# def get_ssmp_ukpf(ar,mon, global_index,filename,year_report): # 2 вызова
+def get_ssmp_ukpf(*args): # параллельный вызов
+    ar = args[0][0]
+    mon = args[0][1]
+    global_index = args[0][2]
+    filename = args[0][3]
+    year_report = args[0][4]
 
+    global_index = global_index
+    sale_finished_products_UKPF =  ar[0]
+    balance_depot_stock_UKPF =  ar[1]
+    adm_UKPF =  ar[2]
+    PP_UKPF =  ar[3]
+    per_3_UKPF =  ar[4]
+    per_2_UKPF_meat =  ar[5]
+    per_2_UKPF_product =  ar[6]
+    per_2_UKPF_losses =  ar[7]
+    per_1_UKPF =  ar[8]
+    NZ_UKPF =  ar[9]
+    UIS_UKPF =  ar[10]
+    DATA_upload =  ar[11]
+    Production_output =  ar[12]
+
+    mapping =  ar[13]
+    koef_ef =  ar[14]
+    ost_start_new_form =  ar[15]
 
     cons_pr = {}
     per_1 = {}
     per_2 = {}
-    sale_finished_products_UKPF =  pd.read_excel(file_factory,sheet_name='Продажи ГП')
-    balance_depot_stock_UKPF =  pd.read_excel(file_factory,sheet_name='Остатки')
-    adm_UKPF =  pd.read_excel(file_factory,sheet_name='Адм')
-    PP_UKPF =  pd.read_excel(file_factory,sheet_name='РР')
-    per_3_UKPF =  pd.read_excel(file_factory,sheet_name='3 передел')
-    per_2_UKPF_meat =  pd.read_excel(file_factory,sheet_name='2 передел мясо')
-    per_2_UKPF_product =  pd.read_excel(file_factory,sheet_name='2 передел гп')
-    per_2_UKPF_losses =  pd.read_excel(file_factory,sheet_name='2 передел потери')
-    per_1_UKPF =  pd.read_excel(file_factory,sheet_name='1 передел')
-    NZ_UKPF =  pd.read_excel(file_factory,sheet_name='Накладные затраты',header=[0,1,2])
-    UIS_UKPF =  pd.read_excel(file_factory,sheet_name='УиС')
-    DATA_upload =  pd.read_excel(file_factory,sheet_name='Общие данные по выходу')
-    Production_output =  pd.read_excel(file_factory,sheet_name='Выпуск ГП')
-    mapping =  pd.read_excel(file_mapping,sheet_name='Mapping',header=[0,1] )
-    koef_ef =  pd.read_excel(file_coef_cenn,sheet_name='Лист1')
-    ost_start_new_form =  pd.read_excel(file_ost_nach_g,sheet_name='Sheet1',index_col=0)
+    # sale_finished_products_UKPF =  pd.read_excel(file_factory,sheet_name='Продажи ГП')
+    # balance_depot_stock_UKPF =  pd.read_excel(file_factory,sheet_name='Остатки')
+    # adm_UKPF =  pd.read_excel(file_factory,sheet_name='Адм')
+    # PP_UKPF =  pd.read_excel(file_factory,sheet_name='РР')
+    # per_3_UKPF =  pd.read_excel(file_factory,sheet_name='3 передел')
+    # per_2_UKPF_meat =  pd.read_excel(file_factory,sheet_name='2 передел мясо')
+    # per_2_UKPF_product =  pd.read_excel(file_factory,sheet_name='2 передел гп')
+    # per_2_UKPF_losses =  pd.read_excel(file_factory,sheet_name='2 передел потери')
+    # per_1_UKPF =  pd.read_excel(file_factory,sheet_name='1 передел')
+    # NZ_UKPF =  pd.read_excel(file_factory,sheet_name='Накладные затраты',header=[0,1,2])
+    # UIS_UKPF =  pd.read_excel(file_factory,sheet_name='УиС')
+    # DATA_upload =  pd.read_excel(file_factory,sheet_name='Общие данные по выходу')
+    # Production_output =  pd.read_excel(file_factory,sheet_name='Выпуск ГП')
+    # mapping =  pd.read_excel(file_mapping,sheet_name='Mapping',header=[0,1] )
+    # koef_ef =  pd.read_excel(file_coef_cenn,sheet_name='Лист1')
+    # ost_start_new_form =  pd.read_excel(file_ost_nach_g,sheet_name='Sheet1',index_col=0)
 
     # Блок типизации данных
     dates = [x for x in PP_UKPF.columns if isinstance(x, datetime.datetime)]
@@ -73,8 +98,8 @@ def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, m
         # отсекли только то что в соответствующих переделах из справочников mapping
 
         # Блок получения данных по mapping (Отсекаем только то что есть в mapping)
-        key = filename
-        # key = filename.split('.')[0]
+
+        key = filename.split('.')[0]
         dict_mapping = {'УКПФ': ['Мэппинг УКПФ 1 передел', 'Мэппинг УКПФ 2 передел', 'Мэппинг УКПФ Затраты'],
                         'МПФ': ['Мэппинг МПФ 1 передел', 'Мэппинг МПФ 2 передел', 'Мэппинг МПФ Затраты']}
 
@@ -172,7 +197,7 @@ def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, m
         dict_koef_ef = rev_to_dict(koef_ef[koef_ef['Признак'] == 'обвалка']['Продукция'],
                                    koef_ef[koef_ef['Признак'] == 'обвалка']['Коэффициент'])
         part_1_cons_2_per_product['Доля стоимости 2 передела'] = part_1_cons_2_per_product.apply(
-            lambda x: insert_vpr(x['часть'], dict_koef_ef, 'Коэффициент'), axis=1).astype('str')
+            lambda x: insert_vpr(x['часть'], dict_koef_ef, 'Коэффициент'), axis=1)
 
         part_1_cons_2_per_product['усл.ед.'] = part_1_cons_2_per_product['Доля стоимости 2 передела'].astype(
             'float64') * part_1_cons_2_per_product['%%от тушки']
@@ -196,27 +221,37 @@ def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, m
                        (df_3[df_3['Продукция'] == 'Грудка ЦБ'][current_month].sum() +
                         df_3[df_3['Продукция'] == 'Окорочок ЦБ'][current_month].sum())
             elif key == 'МПФ':
-                start_index_ = df_3[df_3['Продукция'] == 'Набор для "чахохбили"'].index
-                a = start_index_
-                while True:
+                #                 start_index_ = df_3[df_3['Продукция']=='Набор для "чахохбили"'].index
+                #                 a = start_index_
+                #                 while True:
 
-                    if df_3.iloc[a]['Продукция'].values[0].find('Окорочок ЦБ') != -1:
-                        break
-                    else:
-                        a = a + 1
+                #                     if df_3.iloc[   a    ]['Продукция'].values[0].find('Окорочок ЦБ')!=-1:
+                #                         break
+                #                     else:
+                #                         a = a + 1
 
-                #                 print(a)
-                t = df_3.iloc[a].sum()[current_month]
-                return (df_2[df_2['часть'] == 'грудка']['С/с 2 передела'].sum() * t + \
+                # #                 print(a)
+                #                 t = df_3.iloc[   a     ].sum()[current_month]
+                #                 return df_3[df_3['Продукция']=='Набор для "чахохбили"'][current_month].sum()
+                return (df_2[df_2['часть'] == 'грудка']['С/с 2 передела'].sum() *
+                        df_3[df_3['Продукция'] == 'Грудка ЦБ в групповой упаковке в оборотной таре (охл.)'][
+                            current_month].sum() + \
                         df_2[df_2['часть'] == 'окорочок']['С/с 2 передела'].sum() *
-                        df_3[df_3['Продукция'] == 'Набор для "чахохбили"'][current_month].sum()) / \
-                       (df_3[df_3['Продукция'] == 'Набор для "чахохбили"'][current_month].sum() + t)
+                        df_3[df_3['Продукция'] == 'Окорочок ЦБ в групповой упаковке в оборотной таре (охл.)'][
+                            current_month].sum()) / \
+                       (df_3[df_3['Продукция'] == 'Окорочок ЦБ в групповой упаковке в оборотной таре (охл.)'][
+                            current_month].sum() +
+                        df_3[df_3['Продукция'] == 'Грудка ЦБ в групповой упаковке в оборотной таре (охл.)'][
+                            current_month].sum())
 
         part_1_cons_2_per_product = part_1_cons_2_per_product.append(pd.DataFrame(columns=['часть', 'С/с 2 передела'],
                                                                                   data={'часть': ['Чахохбили'],
                                                                                         'С/с 2 передела': [get_chahoh(
                                                                                             part_1_cons_2_per_product,
                                                                                             curr_per_3_UKPF)]}))
+
+        #         if ind___+1==2:
+        #             return part_1_cons_2_per_product,Mean_SS_1_zperedel_without_amort
 
         per_1[current_month] = part_1_cons_1_per
         per_2[current_month] = part_1_cons_2_per_product
@@ -295,8 +330,8 @@ def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, m
 
         # ------------------------------
 
-        # if ind___ + 1 == 1:
-        #     return curr_Production_output_UKPF, curr_UIS_UKPF
+        #         if ind___+1==1:
+        #             return curr_Production_output_UKPF,curr_UIS_UKPF
 
         curr_Production_output_UKPF['Упаковочный материал тг/кг'] = curr_Production_output_UKPF.apply(
             lambda x: 0 if x[current_month] == 0 else x['Упаковочный материал тыс. тг'] / \

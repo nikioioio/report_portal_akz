@@ -1,4 +1,7 @@
+//В данном модуле  происходит возаимодействие с backend отчета
 function get_val() {
+
+    //проверка на незаполненные параметры
 
     if ($('#month_').val()==''){
         alert('Введите месяц!!!')
@@ -10,14 +13,9 @@ function get_val() {
     }
 
 
-
-
     var control = document.getElementById("ctrl");
     var data1 = new FormData()
-    var data2 = new FormData()
-    // data1.append('dcn', $('#docn').val())
-    // data1.append('dc', $('#doc').val())
-    // console.log(control.files[1])
+
     var arr = control.files
     for (index = 0; index < arr.length; index++) {
         if (arr[index].name == "АМП и АМД.xlsx") {
@@ -74,7 +72,6 @@ function get_val() {
     xhr.responseType = 'arraybuffer';
     $('#circularG').css({'display':'block'})
     $('#btn_send').attr('disabled',true)
-
     xhr.onload = function (e) {
 
         $('#circularG').css({'display':'none'})
@@ -94,9 +91,13 @@ function get_val() {
             a.download = filename;
             document.body.appendChild(a);
             a.click();
+            alert('Отчет сформирован')
         } else {
             Materialize.toast('Invalid data!', 2000);
         }
+    }
+    xhr.onerror = function (ev){
+        alert('Формирование заверщилось ошибкой')
     }
 
     xhr.send(data1);

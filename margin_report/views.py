@@ -9,8 +9,11 @@ from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
+from multiprocessing import Pool
 
 # Create your views here.
+from modules.margin_report.perralel_read_files import get_files
+
 
 def starting_page(request):
     title = 'Margin Report'
@@ -32,21 +35,70 @@ def upload_files(request):
             year_ = request.POST['year']
             month_ = request.POST['month']
 
-            df = pd.read_excel(df_mpf,sheet_name='3 передел',header=[0,1])
+            factries = ['УКПФ.xlsx', 'МПФ.xlsx']
+            dict_pars = [['Продажи ГП', 0],
+                         ['Остатки', 0],
+                         ['Адм', 0],
+                         ['РР', 0],
+                         ['3 передел', 0],
+                         ['2 передел мясо', 0],
+                         ['2 передел гп', 0],
+                         ['2 передел потери', 0],
+                         ['1 передел', 0],
+                         ['Накладные затраты', [0, 1, 2]],
+                         ['УиС', 0],
+                         ['Общие данные по выходу', 0],
+                         ['Выпуск ГП', 0]]
 
+            pool = Pool(processes=4)
+
+            arrs_input_func_ukpf = [(df_ukpf, x[0], x[1]) for x in dict_pars] + [
+                (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
+                (df_ost_ukpf, 'Sheet1', 'ost_nach')]
+
+            arrs_input_func_mpf= [(df_mpf, x[0], x[1]) for x in dict_pars] + [
+                (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
+                (df_ost_mpf, 'Sheet1', 'ost_nach')]
+
+            df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
+            df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
             global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
 
-            prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(file_factory=df_mpf,file_mapping=df_mapping,
-                                                                 file_coef_cenn=df_koef_cen,
-                                                                 file_ost_nach_g=df_ost_mpf,mon=int(month_),
-                                                                 global_index=global_index,filename='МПФ',
-                                                                 year_report=int(year_))
-            
-            prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(file_factory=df_ukpf, file_mapping=df_mapping,
-                                                                    file_coef_cenn=df_koef_cen,
-                                                                    file_ost_nach_g=df_ost_ukpf, mon=int(month_),
-                                                                    global_index=global_index, filename='УКПФ',
-                                                                    year_report=int(year_))
+            pool.close()
+
+            pool = Pool(processes=2)
+
+            arrs_get_ssmp = [(df_list_mpf,int(month_),global_index,'МПФ',int(year_)),
+                             (df_list_ukpf,int(month_),global_index,'УКПФ',int(year_))]
+
+            ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
+
+            pool.close()
+
+            prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
+
+            prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
+
+            # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(ar = df_list_mpf,mon=int(month_),
+            #                                                      global_index=global_index,filename='МПФ',
+            #                                                      year_report=int(year_))
+            #
+            # prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(ar = df_list_ukpf, mon=int(month_),
+            #                                                         global_index=global_index, filename='УКПФ',
+            #                                                         year_report=int(year_))
+
+            #
+            # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(file_factory=df_mpf,file_mapping=df_mapping,
+            #                                                      file_coef_cenn=df_koef_cen,
+            #                                                      file_ost_nach_g=df_ost_mpf,mon=int(month_),
+            #                                                      global_index=global_index,filename='МПФ',
+            #                                                      year_report=int(year_))
+            #
+            # prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(file_factory=df_ukpf, file_mapping=df_mapping,
+            #                                                         file_coef_cenn=df_koef_cen,
+            #                                                         file_ost_nach_g=df_ost_ukpf, mon=int(month_),
+            #                                                         global_index=global_index, filename='УКПФ',
+            #                                                         year_report=int(year_))
 
 
             # df1 = pd.DataFrame({'hhhh':[1,2,3]})
@@ -63,7 +115,7 @@ def upload_files(request):
 
             response = StreamingHttpResponse(output,
                                              content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename=test.xlsx'
+            response['Content-Disposition'] = f'attachment; filename=margin.xlsx'
 
             return response
 
