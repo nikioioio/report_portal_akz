@@ -1,8 +1,9 @@
 //В данном модуле  происходит возаимодействие с backend отчета
 function get_val() {
 
+    //удаляем стэк если он есть
+    $(".trace").remove()
     //проверка на незаполненные параметры
-
     if ($('#month_').val()==''){
         alert('Введите месяц!!!')
         return
@@ -93,12 +94,40 @@ function get_val() {
             a.click();
             alert('Отчет сформирован')
         } else {
-            Materialize.toast('Invalid data!', 2000);
+
+            function arrayBufferToString( buffer, encoding ) {
+                return new Promise((resolve,reject) => {
+
+                    var blob = new Blob([buffer],{type:'text/plain'});
+                    var reader = new FileReader();
+                    reader.readAsText(blob, encoding);
+                    reader.onload = (ev) => {
+                        if (ev.target){
+                            resolve(ev.target.result)
+                        }else{
+                            reject(new Error('Could not convert string to string!'));
+                        }
+                    }
+                })
+
+            }
+
+            arrayBufferToString(this.response, 'UTF-8').then((r)=>{
+                var decoder = new TextDecoder('utf-8')
+                message = JSON.parse(r)['error']
+                message1 = JSON.parse(r)['error1']
+                // console.log(message)
+                $('body').append('<article class="trace">'+message+'</article>').css({'fontsize':'24px'})
+                // $('body').append('<article class="trace">'+message1+'</article>').css({'fontsize':'24px'})
+                // alert(message)
+            })
+
+            // Materialize.toast('Invalid data!', 2000)
         }
     }
-    xhr.onerror = function (ev){
-        alert('Формирование заверщилось ошибкой')
-    }
+    // xhr.onerror = function (ev){
+    //     alert('Формирование заверщилось ошибкой')
+    // }
 
     xhr.send(data1);
 }

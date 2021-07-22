@@ -4,12 +4,13 @@ from modules.margin_report.module_ssmp import get_ssmp_ukpf
 
 
 import xlsxwriter
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse, StreamingHttpResponse,JsonResponse
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 from multiprocessing import Pool
+import sys
 
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
@@ -21,6 +22,11 @@ def starting_page(request):
 
 @csrf_exempt
 def upload_files(request):
+    # try:
+    #     a = 1/0
+    #     # raise TypeError('hi')
+    # except Exception as e:
+    #     return HttpResponse(e.args,status=500)
 
     if request.method == 'POST':
         try:
@@ -48,36 +54,43 @@ def upload_files(request):
                          ['Накладные затраты', [0, 1, 2]],
                          ['УиС', 0],
                          ['Общие данные по выходу', 0],
-                         ['Выпуск ГП', 0]]
+                         ['Выпуск ГП', 0],
+                         ['ММО',[0,1]]]
 
             pool = Pool(processes=4)
 
-            arrs_input_func_ukpf = [(df_ukpf, x[0], x[1]) for x in dict_pars] + [
-                (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
-                (df_ost_ukpf, 'Sheet1', 'ost_nach')]
+            try:
 
-            arrs_input_func_mpf= [(df_mpf, x[0], x[1]) for x in dict_pars] + [
-                (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
-                (df_ost_mpf, 'Sheet1', 'ost_nach')]
+                arrs_input_func_ukpf = [(df_ukpf, x[0], x[1]) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
+                    (df_ost_ukpf, 'Sheet1', 'ost_nach')]
 
-            df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
-            df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
-            global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
+                arrs_input_func_mpf= [(df_mpf, x[0], x[1]) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
+                    (df_ost_mpf, 'Sheet1', 'ost_nach')]
 
-            pool.close()
+                df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
+                df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
+                global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
 
-            pool = Pool(processes=2)
+                pool.close()
 
-            arrs_get_ssmp = [(df_list_mpf,int(month_),global_index,'МПФ',int(year_)),
-                             (df_list_ukpf,int(month_),global_index,'УКПФ',int(year_))]
+                pool = Pool(processes=2)
 
-            ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
+                arrs_get_ssmp = [(df_list_mpf,int(month_),global_index,'МПФ',int(year_)),
+                                 (df_list_ukpf,int(month_),global_index,'УКПФ',int(year_))]
 
-            pool.close()
+                ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
 
-            prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
+                pool.close()
 
-            prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
+                prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
+
+                prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
+
+            except Exception as e:
+                return JsonResponse({'error':str(e.__cause__).encode().decode('utf-8', 'ignore'),
+                                     'error1':str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
             # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(ar = df_list_mpf,mon=int(month_),
             #                                                      global_index=global_index,filename='МПФ',

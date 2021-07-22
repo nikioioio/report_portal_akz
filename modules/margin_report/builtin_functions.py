@@ -160,3 +160,12 @@ def save_iter_month_xlsx(directory_out, df, months, name):
             df[date].to_excel(directory_out + str(date.month) + name)
     except KeyError:
         pass
+
+
+# Функция Реструктурирует таблицу с мультиколонками  для того чтобы pandas воспринимал индекс
+def restruct_multitindex(df):
+    df.rename(columns=dict((x[1],'') for x in df.columns if x[1].find('Unnamed')!=-1) ,inplace=True)
+    df = df.dropna(axis='index', how='any', subset=[('Артикул','','')])
+    df  = retype_multiindex(df, 'int', 'Артикул', 0)
+    df = df.set_index('Артикул')
+    return df

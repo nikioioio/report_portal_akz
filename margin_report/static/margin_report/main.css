@@ -109,3 +109,9 @@ input {
 .border-button:hover {
     background: rgba(255, 255, 255, .2);
 }
+
+.trace{
+    font-size: 20px;
+    color: #f05d22;
+    padding-top: 5px;
+}
