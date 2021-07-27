@@ -33,14 +33,21 @@ function genMain(json) {
     for (var key in json) {
         let but = document.createElement('button');
 
-        but.onclick = function (){
-            genProduct(json[but.textContent][2])
+        but.onclick = function () {
+            genProduct(json[but.textContent][2], but.textContent, json)
         }
         but.textContent = key
 
         let inp = document.createElement('input');
         inp.className = 'size'
         inp.value = json[key][0]
+        inp.setAttribute('data-path', [key])
+        // console.log(inp.getAttribute('data-path'))
+        inp.addEventListener('blur', function (e) {
+            let targ = e.target
+            json[targ.getAttribute('data-path')][0] = targ.value
+            console.log(json)
+        })
 
         let str_ = document.createElement('a')
         str_.textContent = '/' + json[key][1]
@@ -71,7 +78,7 @@ function genMain(json) {
 
 }
 
-function genProduct(json){
+function genProduct(json, val_ch, global_json) {
     // console.log(json)
     $('.three').remove()
 
@@ -87,6 +94,16 @@ function genProduct(json){
         let inp = document.createElement('input');
         inp.className = 'size'
         inp.value = json[key][0]
+        inp.setAttribute('data-path', [val_ch, key, 0])
+
+        inp.addEventListener('blur', function (e) {
+            let targ = e.target
+            let arr = inp.getAttribute('data-path').split(',')
+            // console.log(arr[0])
+            // json[arr[1]][arr[2]] = targ.value
+            global_json[arr[0]][2][arr[1]][arr[2]] = targ.value
+            console.log(global_json)
+        })
 
 
         let str__ = document.createElement('a')
@@ -102,7 +119,6 @@ function genProduct(json){
         for (var key_ in json[key][2]) {
 
 
-
             let str__ = document.createElement('a')
             str__.textContent = key_
 
@@ -113,15 +129,21 @@ function genProduct(json){
             let inp__ = document.createElement('input');
             inp__.className = 'size'
             inp__.value = json[key][2][key_][0]
+            inp__.setAttribute('data-path', [val_ch, key, key_, 0])
+
+            inp__.addEventListener('blur', function (e) {
+                let targ = e.target
+                let arr = inp__.getAttribute('data-path').split(',')
+                global_json[arr[0]][2][arr[1]][2][arr[2]][0] = targ.value
+            })
 
 
             let str___ = document.createElement('a')
-            if(typeof json[key][2][key_][1] == "undefined"){
+            if (typeof json[key][2][key_][1] == "undefined") {
                 str___.textContent = ''
-            }else {
+            } else {
                 str___.textContent = '/' + json[key][2][key_][1]
             }
-
 
 
             div__.appendChild(str__)
@@ -133,19 +155,17 @@ function genProduct(json){
         }
 
 
-    let div___ = document.createElement('div');
-    div___.className = 'three'
+        let div___ = document.createElement('div');
+        div___.className = 'three'
 
-    let per_pr = document.createElement('button');
-    per_pr.textContent = 'Перерасчитать продукты'
+        let per_pr = document.createElement('button');
+        per_pr.textContent = 'Перерасчитать продукты'
 
-    let sb_prod = document.createElement('button');
-    sb_prod.textContent = 'Сбросить продукты'
-    div___.appendChild(per_pr)
-    div___.appendChild(sb_prod)
-    $('#right').append(div___)
-
-
+        let sb_prod = document.createElement('button');
+        sb_prod.textContent = 'Сбросить продукты'
+        div___.appendChild(per_pr)
+        div___.appendChild(sb_prod)
+        $('#right').append(div___)
 
 
     }
