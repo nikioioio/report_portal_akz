@@ -61,13 +61,13 @@ def upload_files(request):
 
             try:
 
-                arrs_input_func_ukpf = [(df_ukpf, x[0], x[1]) for x in dict_pars] + [
-                    (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
-                    (df_ost_ukpf, 'Sheet1', 'ost_nach')]
+                arrs_input_func_ukpf = [(df_ukpf, x[0], x[1],int(year_),int(month_)) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1],int(year_),int(month_)), (df_koef_cen, 'Лист1', 0,int(year_),int(month_)),
+                    (df_ost_ukpf, 'Sheet1', 'ost_nach',int(year_),int(month_))]
 
-                arrs_input_func_mpf= [(df_mpf, x[0], x[1]) for x in dict_pars] + [
-                    (df_mapping, 'Mapping', [0, 1]), (df_koef_cen, 'Лист1', 0),
-                    (df_ost_mpf, 'Sheet1', 'ost_nach')]
+                arrs_input_func_mpf= [(df_mpf, x[0], x[1],int(year_),int(month_)) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1],int(year_),int(month_)), (df_koef_cen, 'Лист1', 0,int(year_),int(month_)),
+                    (df_ost_mpf, 'Sheet1', 'ost_nach',int(year_),int(month_))]
 
                 df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
                 df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
