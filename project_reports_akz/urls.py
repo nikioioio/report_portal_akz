@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("main_app.urls")),
     path("margin_report/", include("margin_report.urls")),
+    path("plain_test/", include("plain_test.urls")),
 ]

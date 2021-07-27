@@ -2,9 +2,8 @@ import os
 from io import StringIO, BytesIO
 from modules.margin_report.module_ssmp import get_ssmp_ukpf
 
-
 import xlsxwriter
-from django.http import HttpResponse, StreamingHttpResponse,JsonResponse
+from django.http import HttpResponse, StreamingHttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
@@ -18,7 +17,8 @@ from modules.margin_report.perralel_read_files import get_files
 
 def starting_page(request):
     title = 'Margin Report'
-    return render(request, "margin_report/index.html",context={'title':title})
+    return render(request, "margin_report/index.html", context={'title': title})
+
 
 @csrf_exempt
 def upload_files(request):
@@ -34,7 +34,7 @@ def upload_files(request):
             df_amp_and_amd = request.FILES['amp_and_amd']
             df_mpf = request.FILES['МПФ']
             df_ukpf = request.FILES['УКПФ']
-            df_mapping= request.FILES['mapping']
+            df_mapping = request.FILES['mapping']
             df_koef_cen = request.FILES['koef_cen']
             df_ost_mpf = request.FILES['ost_mpf']
             df_ost_ukpf = request.FILES['ost_ukpf']
@@ -55,19 +55,21 @@ def upload_files(request):
                          ['УиС', 0],
                          ['Общие данные по выходу', 0],
                          ['Выпуск ГП', 0],
-                         ['ММО',[0,1]]]
+                         ['ММО', [0, 1]]]
 
             pool = Pool(processes=4)
 
             try:
 
-                arrs_input_func_ukpf = [(df_ukpf, x[0], x[1],int(year_),int(month_)) for x in dict_pars] + [
-                    (df_mapping, 'Mapping', [0, 1],int(year_),int(month_)), (df_koef_cen, 'Лист1', 0,int(year_),int(month_)),
-                    (df_ost_ukpf, 'Sheet1', 'ost_nach',int(year_),int(month_))]
+                arrs_input_func_ukpf = [(df_ukpf, x[0], x[1], int(year_), int(month_)) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
+                    (df_koef_cen, 'Лист1', 0, int(year_), int(month_)),
+                    (df_ost_ukpf, 'Sheet1', 'ost_nach', int(year_), int(month_))]
 
-                arrs_input_func_mpf= [(df_mpf, x[0], x[1],int(year_),int(month_)) for x in dict_pars] + [
-                    (df_mapping, 'Mapping', [0, 1],int(year_),int(month_)), (df_koef_cen, 'Лист1', 0,int(year_),int(month_)),
-                    (df_ost_mpf, 'Sheet1', 'ost_nach',int(year_),int(month_))]
+                arrs_input_func_mpf = [(df_mpf, x[0], x[1], int(year_), int(month_)) for x in dict_pars] + [
+                    (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
+                    (df_koef_cen, 'Лист1', 0, int(year_), int(month_)),
+                    (df_ost_mpf, 'Sheet1', 'ost_nach', int(year_), int(month_))]
 
                 df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
                 df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
@@ -77,8 +79,8 @@ def upload_files(request):
 
                 pool = Pool(processes=2)
 
-                arrs_get_ssmp = [(df_list_mpf,int(month_),global_index,'МПФ',int(year_)),
-                                 (df_list_ukpf,int(month_),global_index,'УКПФ',int(year_))]
+                arrs_get_ssmp = [(df_list_mpf, int(month_), global_index, 'МПФ', int(year_)),
+                                 (df_list_ukpf, int(month_), global_index, 'УКПФ', int(year_))]
 
                 ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
 
@@ -89,8 +91,8 @@ def upload_files(request):
                 prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
 
             except Exception as e:
-                return JsonResponse({'error':str(e.__cause__).encode().decode('utf-8', 'ignore'),
-                                     'error1':str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
+                return JsonResponse({'error': str(e.__cause__).encode().decode('utf-8', 'ignore'),
+                                     'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
             # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(ar = df_list_mpf,mon=int(month_),
             #                                                      global_index=global_index,filename='МПФ',
@@ -113,7 +115,6 @@ def upload_files(request):
             #                                                         global_index=global_index, filename='УКПФ',
             #                                                         year_report=int(year_))
 
-
             # df1 = pd.DataFrame({'hhhh':[1,2,3]})
             output = BytesIO()
 
@@ -135,3 +136,21 @@ def upload_files(request):
 
         except MultiValueDictKeyError:
             return HttpResponse('При загрузке Файла произошла ошибка')
+
+
+@csrf_exempt
+def refresh(request):
+    kr = [1000, 2000,
+          {'Крыло ЦБ на подложке': [3402, 3347,
+                                    {'КФС': [2115, 2020], 'KA': [347, 658], 'Кейтеринг': [885, 986], 'Остаток': [0]}]}
+          ]
+
+    ее = [500, 700,
+          {'Крыло ЦБ на ааа': [524, 33457857,
+                                    {'КФС': [21585, 2020], 'KA': [347, 658]}]}
+          ]
+
+
+
+    json = {'Крыло': kr,'Тушка':ее}
+    return JsonResponse(json)
