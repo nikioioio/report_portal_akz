@@ -28,7 +28,7 @@ function get_arr() {
             let sb_product = document.getElementById('sb_pr')
 
             sb_product.addEventListener('click', function () {
-
+                // console.log(etalonJson)
                 arr_keys = document.querySelectorAll("[data-title='1']")
                 json = dump_prod(json, etalonJson, arr_keys)
                 genMain(json)
@@ -81,12 +81,20 @@ function dump_ch(json, etalon) {
 }
 
 function dump_prod(json, etalon, arr_keys) {
+
     arr_keys.forEach(function (item, i, arr) {
         for (var key in json) {
 
             for (key_ in json[key][2]){
                 if (typeof json[key][2][key_][item.textContent] != "undefined") {
-                    json[key][2][key_][item.textContent] = etalon[key][2][key_][item.textContent]
+                    // json[key][2][key_][item.textContent] = etalon[key][2][key_][item.textContent]
+                    json[key][2][key_][item.textContent][0] = parseInt(etalon[key][2][key_][item.textContent][0])
+
+                    for (var p in etalon[key][2][key_][item.textContent][2]){
+                        json[key][2][key_][item.textContent][2][p][0] = parseInt(etalon[key][2][key_][item.textContent][2][p][0])
+                    }
+
+                    // console.log(etalon[key][2][key_][item.textContent][2])
                     // json[key][2][0] = etalon[key][2][0]
                 }
             }
@@ -97,7 +105,6 @@ function dump_prod(json, etalon, arr_keys) {
 
     return json
 
-    return 0
 }
 
 
