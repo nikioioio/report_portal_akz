@@ -43,5 +43,5 @@ def update(request):
         js = request.POST['data1']
         json_obg = json.loads(js)
         print(json_obg)
-        return HttpResponse({'status':200})
+        return JsonResponse({'status':200})
 

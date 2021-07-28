@@ -21,7 +21,7 @@ function get_arr() {
                 json = dump_ch(json, etalonJson)
                 genMain(json)
 
-                console.log(json)
+                // console.log(json)
 
             })
 
@@ -45,13 +45,13 @@ function get_arr() {
                 data1.append('data1',JSON.stringify(json))
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', 'update/');
-                // xhr.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                xhr.responseType = "application/json";
+                // xhr.setRequestHeader('Content-Type', "application/json");
+                // xhr.responseType = "application/json";
 
                 xhr.onload = function (e) {
 
                     if (this.status == 200) {
-
+                        console.log(this.response)
                     }
                 }
 
