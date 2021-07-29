@@ -1,8 +1,9 @@
 import pandas as pd
 from io import BytesIO
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse,JsonResponse,HttpResponse
 import datetime
 import calendar
+import base64
 
 def save_backup(path_backup, arrs):
     try:
@@ -214,3 +215,30 @@ def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,pe
     response['Content-Disposition'] = f'attachment; filename=margin ' +date_for_name_file+'.xlsx'
 
     return response
+
+#Функций для отправки нескольких файлов
+def generate_exlx_for_ajax_test():
+
+
+
+    output = BytesIO()
+
+    # Возврат на frontend файла excel
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    df = pd.DataFrame({'gg':[1,2,3]})
+    df.to_excel(writer, sheet_name='Остатки МПФ')
+    writer.save()
+    output = base64.b64encode(output.getvalue()).decode()
+
+
+
+    output1 = BytesIO()
+    writer1 = pd.ExcelWriter(output1, engine='xlsxwriter')
+    df = pd.DataFrame({'gg': [1, 2, 4]})
+    df.to_excel(writer1, sheet_name='Остатки csdccs')
+    writer1.save()
+    output1 = base64.b64encode(output1.getvalue()).decode()
+
+
+    return JsonResponse({'file1':output,'file2':output1})

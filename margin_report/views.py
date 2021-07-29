@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 from multiprocessing import Pool
 import sys
-from modules.margin_report.builtin_functions import generate_exlx_for_ajax
+from modules.margin_report.builtin_functions import generate_exlx_for_ajax,generate_exlx_for_ajax_test
 
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
@@ -102,3 +102,7 @@ def upload_files(request):
             return HttpResponse('При загрузке Файла произошла ошибка')
 
 
+@csrf_exempt
+def test_get_json(request):
+    if request.method == 'POST':
+        return generate_exlx_for_ajax_test()
