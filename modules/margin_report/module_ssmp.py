@@ -58,6 +58,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
     # ost_start_new_form = pd.read_excel(directory + ost_nach_g, sheet_name='Sheet1', index_col=0)
     # mmo = pd.read_excel(directory + filename, sheet_name='ММО', header=[0, 1])
     # Блок типизации данных
+    # Блок типизации данных
     dates = [x for x in PP_UKPF.columns if isinstance(x, datetime.datetime)]
 
     # Изменил тип артикула
@@ -229,6 +230,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                        (df_3[df_3['Продукция'] == 'Грудка ЦБ'][current_month].sum() +
                         df_3[df_3['Продукция'] == 'Окорочок ЦБ'][current_month].sum())
             elif key == 'МПФ':
+
                 return (df_2[df_2['часть'] == 'грудка']['С/с 2 передела'].sum() *
                         df_3[df_3['Продукция'] == 'Грудка ЦБ в групповой упаковке в оборотной таре (охл.)'][
                             current_month].sum() + \
@@ -241,7 +243,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                             current_month].sum())
 
         # логика по ммо df1 это текущие данные ммо(исходник), df2 это рассчитанные данные по второму переделу
-
+        #         if ind___+1==1:
+        #             return get_chahoh(part_1_cons_2_per_product,curr_per_3_UKPF)
         df_for_mo_mapping = pd.concat([curr_per_1_UKPF,
                                        curr_per_2_UKPF_meat,
                                        curr_per_2_UKPF_product,
@@ -413,8 +416,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # ------------------------------
 
-        dict_slaughter_costs = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                           mapping['Мэппинг УКПФ Затраты']['Upstream'])
+        dict_slaughter_costs = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                           mapping['Мэппинг ' + key + ' Затраты']['Upstream'])
         curr_Production_output_UKPF['Затраты на убой и потрошение, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_slaughter_costs, 'Upstream'), axis=1).astype('str')
 
@@ -442,22 +445,23 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # ------------------------------
 
-        dict_cutting_up = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                      mapping['Мэппинг УКПФ Затраты']['Разделка'])
+        dict_cutting_up = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                      mapping['Мэппинг ' + key + ' Затраты']['Разделка'])
         curr_Production_output_UKPF['Затраты на разделку, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_cutting_up, 'Разделка'), axis=1).astype('str')
 
         # ------------------------------
 
         def func(x, col, df, df1, filter_):
-            sum_ = df[df[filter_] == "да"][col].sum()
 
             if x[filter_] == 'да':
-                return (x[current_month] / sum_) * \
+                sum_ = df[df[filter_] == "да"][col].sum()
+                return x[current_month] / sum_ * \
                        df1[df1['Месяц']['Месяц']['Месяц'] == current_month]['downstream']['ОиР'][
                            'остальное'].sum() / 1000
             elif x[filter_] == 'KFC':
-                return (x[current_month] / sum_) * \
+                sum_ = df[df[filter_] == "KFC"][col].sum()
+                return x[current_month] / sum_ * \
                        df1[df1['Месяц']['Месяц']['Месяц'] == current_month]['downstream']['ОиР']['KFC'].sum() / 1000
             else:
                 return 0
@@ -467,7 +471,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                              current_month,
                                                              curr_Production_output_UKPF,
                                                              NZ_UKPF,
-                                                             'Затраты на убой и потрошение, признак'
+                                                             'Затраты на разделку, признак'
                                                              ), axis=1)
 
         # -------------------------------
@@ -478,8 +482,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # -------------------------------
 
-        dict_cooling_down = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                        mapping['Мэппинг УКПФ Затраты']['Охлаждение'])
+        dict_cooling_down = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                        mapping['Мэппинг ' + key + ' Затраты']['Охлаждение'])
         curr_Production_output_UKPF['Затраты на охлаждение, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_cooling_down, 'Охлаждение'), axis=1).astype('str')
 
@@ -512,8 +516,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # -------------------------------
 
-        dict_freezing = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                    mapping['Мэппинг УКПФ Затраты']['Заморозка'])
+        dict_freezing = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                    mapping['Мэппинг ' + key + ' Затраты']['Заморозка'])
         curr_Production_output_UKPF['Затраты на заморозку, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_freezing, 'Заморозка'), axis=1).astype('str')
 
@@ -546,22 +550,22 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # --------------------------------
 
-        dict_individual_pacts = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                            mapping['Мэппинг УКПФ Затраты']['индив. пакет'])
+        dict_individual_pacts = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                            mapping['Мэппинг ' + key + ' Затраты']['индив. пакет'])
         curr_Production_output_UKPF['Затраты на Индив. пакет, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_individual_pacts, 'индив. пакет'), axis=1).astype('str')
 
         # --------------------------------
 
-        dict_background = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                      mapping['Мэппинг УКПФ Затраты']['подложка'])
+        dict_background = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                      mapping['Мэппинг ' + key + ' Затраты']['подложка'])
         curr_Production_output_UKPF['Затраты на Подложку, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_background, 'подложка'), axis=1).astype('str')
 
         # --------------------------------
 
-        dict_group_package = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                         mapping['Мэппинг УКПФ Затраты']['групповой пакет'])
+        dict_group_package = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                         mapping['Мэппинг ' + key + ' Затраты']['групповой пакет'])
         curr_Production_output_UKPF['Затраты на Групп. Пакет, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_group_package, 'групповой пакет'), axis=1).astype('str')
 
@@ -626,6 +630,9 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                              'Затраты на Подложку, признак'
                                                              ), axis=1)
 
+        #         if ind___+1==2:
+        #             return part_1_cons_2_per_product
+
         # --------------------------------
 
         curr_Production_output_UKPF['Затраты на Подложку тг/кг'] = curr_Production_output_UKPF.apply(
@@ -661,21 +668,22 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # --------------------------------
 
-        dict_marinate = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                    mapping['Мэппинг УКПФ Затраты']['маринация'])
+        dict_marinate = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                    mapping['Мэппинг ' + key + ' Затраты']['маринация'])
         curr_Production_output_UKPF['Затраты на Маринацию, признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_marinate, 'маринация'), axis=1).astype('str')
 
         # --------------------------------
 
         def func(x, col, df, df1, filter_):
-            sum_ = df[df[filter_] == "да"][col].sum()
 
             if x[filter_] == 'да':
+                sum_ = df[df[filter_] == "да"][col].sum()
                 return (x[current_month] / sum_) * \
                        df1[df1['Месяц']['Месяц']['Месяц'] == current_month]['downstream']['Маринады'][
                            'остальное'].sum() / 1000
             elif x[filter_] == 'KFC':
+                sum_ = df[df[filter_] == "KFC"][col].sum()
                 return (x[current_month] / sum_) * \
                        df1[df1['Месяц']['Месяц']['Месяц'] == current_month]['downstream']['Маринады'][
                            'KFC'].sum() / 1000
@@ -698,8 +706,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # --------------------------------
 
-        dict_pressing = rev_to_dict(mapping['Мэппинг УКПФ Затраты']['Артикул'],
-                                    mapping['Мэппинг УКПФ Затраты']['Прессование'])
+        dict_pressing = rev_to_dict(mapping['Мэппинг ' + key + ' Затраты']['Артикул'],
+                                    mapping['Мэппинг ' + key + ' Затраты']['Прессование'])
         curr_Production_output_UKPF['Затраты на Прессование признак'] = curr_Production_output_UKPF.apply(
             lambda x: insert_vpr(x['Артикул'], dict_pressing, 'Прессование'), axis=1).astype('str')
 
@@ -716,13 +724,13 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                 return 0
             return
 
-        curr_Production_output_UKPF['Затраты на Прессование тыс. тг'] = 0
-        curr_Production_output_UKPF.apply(lambda x: func(x,
-                                                         current_month,
-                                                         curr_Production_output_UKPF,
-                                                         NZ_UKPF,
-                                                         'Затраты на Прессование признак'
-                                                         ), axis=1)
+        curr_Production_output_UKPF['Затраты на Прессование тыс. тг'] = \
+            curr_Production_output_UKPF.apply(lambda x: func(x,
+                                                             current_month,
+                                                             curr_Production_output_UKPF,
+                                                             NZ_UKPF,
+                                                             'Затраты на Прессование признак'
+                                                             ), axis=1)
 
         # --------------------------------
 
@@ -730,6 +738,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
             lambda x: 0 if x[current_month] == 0 else x['Затраты на Прессование тыс. тг'] / \
                                                       x[current_month] * 1000, axis=1)
 
+        #         if ind___+1==1:
+        #             return curr_Production_output_UKPF
         # --------------------------------
 
         curr_Production_output_UKPF['Итого накладная с/с тыс. тг'] = curr_Production_output_UKPF[
@@ -745,7 +755,11 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                      curr_Production_output_UKPF[
                                                                          'Затраты на Маринацию тыс. тг'] + \
                                                                      curr_Production_output_UKPF[
-                                                                         'Затраты на Прессование тыс. тг']
+                                                                         'Затраты на Прессование тыс. тг'] + \
+                                                                     curr_Production_output_UKPF[
+                                                                         'Затраты на разделку тыс. тг'] + \
+                                                                     curr_Production_output_UKPF[
+                                                                         'Затраты на Подложку тыс. тг']
 
         curr_Production_output_UKPF['Итого накладная с/с тг/кг'] = curr_Production_output_UKPF[
                                                                        'Затраты на убой и потрошение тг/кг'] + \
@@ -760,7 +774,11 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                    curr_Production_output_UKPF[
                                                                        'Затраты на Маринацию тг/кг'] + \
                                                                    curr_Production_output_UKPF[
-                                                                       'Затраты на Прессование тг/кг']
+                                                                       'Затраты на Прессование тг/кг'] + \
+                                                                   curr_Production_output_UKPF[
+                                                                       'Затраты на разделку тг/кг'] + \
+                                                                   curr_Production_output_UKPF[
+                                                                       'Затраты на Подложку тг/кг']
 
         curr_Production_output_UKPF['Итого с/c тыс. тг'] = curr_Production_output_UKPF[
                                                                'Итого с/c с прямыми расходами тыс. тг'] + \
@@ -769,6 +787,9 @@ def get_ssmp_ukpf(*args): # параллельный вызов
         curr_Production_output_UKPF['Итого с/c тг/кг'] = curr_Production_output_UKPF.apply(
             lambda x: 0 if x[current_month] == 0 else x['Итого с/c тыс. тг'] / \
                                                       x[current_month] * 1000, axis=1)
+
+        #         if ind___+1==1:
+        #             return curr_Production_output_UKPF
 
         #    Записали в словарь
         cons_pr[current_month] = curr_Production_output_UKPF
