@@ -10,16 +10,17 @@ from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 from multiprocessing import Pool
 import sys
+from modules.margin_report.builtin_functions import generate_exlx_for_ajax
 
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
 
-
+# Показ стартовой страницы по маржинальности
 def starting_page(request):
     title = 'Margin Report'
     return render(request, "margin_report/index.html", context={'title': title})
 
-
+# Прием файлов и расчет
 @csrf_exempt
 def upload_files(request):
     # try:
@@ -94,63 +95,10 @@ def upload_files(request):
                 return JsonResponse({'error': str(e.__cause__).encode().decode('utf-8', 'ignore'),
                                      'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
-            # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(ar = df_list_mpf,mon=int(month_),
-            #                                                      global_index=global_index,filename='МПФ',
-            #                                                      year_report=int(year_))
-            #
-            # prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(ar = df_list_ukpf, mon=int(month_),
-            #                                                         global_index=global_index, filename='УКПФ',
-            #                                                         year_report=int(year_))
 
-            #
-            # prod_MPF,ost_MPF,per_1_mpf,per_2_mpf = get_ssmp_ukpf(file_factory=df_mpf,file_mapping=df_mapping,
-            #                                                      file_coef_cenn=df_koef_cen,
-            #                                                      file_ost_nach_g=df_ost_mpf,mon=int(month_),
-            #                                                      global_index=global_index,filename='МПФ',
-            #                                                      year_report=int(year_))
-            #
-            # prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = get_ssmp_ukpf(file_factory=df_ukpf, file_mapping=df_mapping,
-            #                                                         file_coef_cenn=df_koef_cen,
-            #                                                         file_ost_nach_g=df_ost_ukpf, mon=int(month_),
-            #                                                         global_index=global_index, filename='УКПФ',
-            #                                                         year_report=int(year_))
-
-            # df1 = pd.DataFrame({'hhhh':[1,2,3]})
-            output = BytesIO()
-
-            # Возврат на frontend файла excel
-            writer = pd.ExcelWriter(output, engine='xlsxwriter')
-            ost_MPF.to_excel(writer, sheet_name='Sheet1')
-            ost_UKPF.to_excel(writer, sheet_name='Sheet2')
-            writer.save()
-
-            output.seek(0)
-            # workbook = output.getvalue()
-
-            response = StreamingHttpResponse(output,
-                                             content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename=margin.xlsx'
-
-            return response
-
+            return generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF)
 
         except MultiValueDictKeyError:
             return HttpResponse('При загрузке Файла произошла ошибка')
 
 
-@csrf_exempt
-def refresh(request):
-    kr = [1000, 2000,
-          {'Крыло ЦБ на подложке': [3402, 3347,
-                                    {'КФС': [2115, 2020], 'KA': [347, 658], 'Кейтеринг': [885, 986], 'Остаток': [0]}]}
-          ]
-
-    ее = [500, 700,
-          {'Крыло ЦБ на ааа': [524, 33457857,
-                                    {'КФС': [21585, 2020], 'KA': [347, 658]}]}
-          ]
-
-
-
-    json = {'Крыло': kr,'Тушка':ее}
-    return JsonResponse(json)

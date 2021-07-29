@@ -1,4 +1,8 @@
 import pandas as pd
+from io import BytesIO
+from django.http import StreamingHttpResponse
+import datetime
+import calendar
 
 def save_backup(path_backup, arrs):
     try:
@@ -169,3 +173,44 @@ def restruct_multitindex(df):
     df  = retype_multiindex(df, 'int', 'Артикул', 0)
     df = df.set_index('Артикул')
     return df
+
+
+def save_iter_month_xlsx(writer,df,iter_months,name):
+    try:
+        for date in iter_months:
+            df[date].to_excel(writer, sheet_name=  str(date.month)+name)
+    except KeyError:
+        pass
+    return writer
+# формирование ответа на фронт с файлом.
+def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF):
+
+    iter_months = [datetime.datetime(year_report, x, calendar.monthrange(year_report, x)[1], 0, 0) for x in
+                   range(1, 13)]
+
+    output = BytesIO()
+
+    # Возврат на frontend файла excel
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    writer = save_iter_month_xlsx(writer, per_1_mpf, iter_months, 'Первый передел МПФ')
+    writer = save_iter_month_xlsx(writer, per_2_mpf, iter_months, 'Второй передел МПФ')
+    writer = save_iter_month_xlsx(writer, per_1_UKPF, iter_months, 'Первый передел УКПФ')
+    writer = save_iter_month_xlsx(writer, per_2_UKPF, iter_months, 'Второй передел УКПФ')
+    writer = save_iter_month_xlsx(writer, prod_MPF, iter_months, 'Себестоимость мяса МПФ')
+    writer = save_iter_month_xlsx(writer, prod_UKPF, iter_months, 'Себестоимость мяса УКПФ')
+    ost_MPF.to_excel(writer, sheet_name='Остатки МПФ')
+    ost_UKPF.to_excel(writer, sheet_name='Остатки УКПФ')
+
+    writer.save()
+
+    output.seek(0)
+    # workbook = output.getvalue()
+    now = datetime.datetime.now()
+    date_for_name_file = now.strftime("%d-%m-%Y %H:%M")
+
+    response = StreamingHttpResponse(output,
+                                     content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename=margin ' +date_for_name_file+'.xlsx'
+
+    return response

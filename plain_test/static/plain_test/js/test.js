@@ -7,7 +7,7 @@ function get_arr() {
     // xhr.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     // xhr.responseType = "application/json";
     xhr.onload = function (e) {
-// сввы
+
         if (this.status == 200) {
             // var json = JSON.parse( JSON.parse(xhr.response)['dat'] );
             var json = JSON.parse(xhr.response)
