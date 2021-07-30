@@ -241,4 +241,4 @@ def generate_exlx_for_ajax_test():
     output1 = base64.b64encode(output1.getvalue()).decode()
 
 
-    return JsonResponse({'file1':output,'file2':output1})
+    return JsonResponse({'file1':output,'file2':output1,'arr':[2,3,4]})

@@ -14,6 +14,8 @@ function test_gen(){
 
             file1 = _base64ToArrayBuffer(this.response['file1'])
             file2 = _base64ToArrayBuffer(this.response['file2'])
+            arr = this.response['arr']
+            console.log(arr)
 
             var blob = new Blob([file1], { type: 'application/vnd.ms-excel' });
 
