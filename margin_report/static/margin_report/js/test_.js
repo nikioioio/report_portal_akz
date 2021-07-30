@@ -63,3 +63,40 @@ function _base64ToArrayBuffer(base64) {
     }
     return bytes.buffer;
 }
+
+
+//Запрос к конейнеру flask gunicorn nginx
+function test_gen1(){
+
+    var control = document.getElementById("ctrl");
+    var data1 = new FormData()
+
+    var arr = control.files
+    for (index = 0; index < arr.length; index++) {
+        console.log(arr[index].name)
+        if (arr[index].name == "3Первый передел МПФ.xlsx") {
+            data1.append('test', arr[index])
+        }
+    }
+
+    data1.append('year', 222);
+
+    var token = '{{ csrf_token }}';
+
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', 'http://127.0.0.1:5000/get_val');
+
+    xhr.onload = function (e) {
+
+        if (this.status == 200) {
+
+            console.log(this.response)
+
+        }
+
+    }
+    console.log(data1)
+    xhr.send(data1)
+
+}
