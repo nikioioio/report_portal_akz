@@ -848,13 +848,17 @@ def get_ssmp_ukpf(*args): # параллельный вызов
             path_ost_kon = ('Остаток', current_month)
 
             # приход для объединения с остатками
+            curr_Production_output_UKPF = curr_Production_output_UKPF.set_index('Артикул')
             production_for_join_ost = curr_Production_output_UKPF.rename(columns={current_month: 'Объем кг'})[cols_join]
+            #
+
             ml = pd.MultiIndex.from_tuples([('Приход', current_month, x) for x in production_for_join_ost.columns])
+
             production_for_join_ost.columns = ml
 
-            it = pd.concat([it, production_for_join_ost], axis=1)
+            it = pd.concat([it.set_index('Артикул'), production_for_join_ost], axis=1)
 
-            it = it.set_index('Артикул')
+        #             it = it.set_index('Артикул')
 
         # формируем расходную часть
 
@@ -1040,3 +1044,4 @@ def get_ssmp_ukpf(*args): # параллельный вызов
             return cons_pr, it, per_1, per_2
 
     return cons_pr, it
+
