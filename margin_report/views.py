@@ -15,6 +15,8 @@ from modules.margin_report.builtin_functions import generate_exlx_for_ajax,gener
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
 
+import base64
+
 # Показ стартовой страницы по маржинальности
 def starting_page(request):
     title = 'Margin Report'
@@ -106,3 +108,14 @@ def upload_files(request):
 def test_get_json(request):
     if request.method == 'POST':
         return generate_exlx_for_ajax_test()
+
+
+@csrf_exempt
+def test_get_json1(request):
+    if request.method == 'POST':
+        # df_amp_and_amd = request.FILES['amp_and_amd']
+        ff = request.POST['amp_and_amd']
+        bytes_io = base64.b64decode(ff)
+        df = pd.read_excel(bytes_io,sheet_name='Остатки МПФ')
+        print(df)
+        return JsonResponse({'status':200})

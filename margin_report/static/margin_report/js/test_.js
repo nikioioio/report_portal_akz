@@ -1,4 +1,6 @@
 //Модуль для скачивания нескольких файлов
+var file_to_upl
+
 function test_gen(){
 
 
@@ -11,11 +13,14 @@ function test_gen(){
     xhr.onload = function (e) {
 
         if (this.status == 200) {
+            file_to_upl = this.response['file1']
 
             file1 = _base64ToArrayBuffer(this.response['file1'])
             file2 = _base64ToArrayBuffer(this.response['file2'])
             arr = this.response['arr']
             console.log(arr)
+
+
 
             var blob = new Blob([file1], { type: 'application/vnd.ms-excel' });
 
@@ -43,6 +48,34 @@ function test_gen(){
     xhr.send()
 
 }
+
+
+function test_gen2(){
+
+    var data1 = new FormData()
+    data1.append('amp_and_amd', file_to_upl)
+
+    var token = '{{ csrf_token }}';
+
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', 'upl_test1/');
+
+    xhr.onload = function (e) {
+
+        if (this.status == 200) {
+
+            console.log('200')
+
+        }
+
+    }
+
+    xhr.send(data1)
+
+}
+
+
 
 function decode_base64(s) {
   var b=l=0, r='',
