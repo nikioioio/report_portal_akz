@@ -3,6 +3,13 @@
 
 {% block css_files %}
     <link rel="stylesheet" href="{% static "margin_report/main.css" %}">
+
+    <script type="text/javascript" src="{% static "./margin_report/js/visual/anychart-base.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "./margin_report/js/visual/anychart-ui.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "./margin_report/js/visual/anychart-exports.min.js" %}"></script>
+    <link rel="stylesheet" href="{% static "margin_report/js/visual/css/anychart-ui.css" %}">
+{#    <link rel="stylesheet" href="{% static "margin_report/js/visual/fonts/anychart-font.css" %}">#}
+    <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -17,15 +24,16 @@
 
 
     <button id="btn_send" class="border-button" onclick="get_val()">Получить отчет</button>
-    <button id="btn_send" class="border-button" onclick="test_gen()">test_gen</button>
+{#    <button id="btn_send" class="border-button" onclick="test_gen()">test_gen</button>#}
 {#    <button id="btn_send1" class="border-button" onclick="test_gen1()">test_gen1</button>#}
-    <button id="btn_send1" class="border-button" onclick="test_gen2()">test_gen2</button>
+{#    <button id="btn_send1" class="border-button" onclick="test_gen2()">test_gen2</button>#}
 
 
-
+    <div id="container"></div>
 
     <script type="text/javascript" src="{% static "./margin_report/js/main.js" %}"></script>
     <script type="text/javascript" src="{% static "./margin_report/js/test_.js" %}"></script>
+    <script type="text/javascript" src="{% static "./margin_report/js/visual_.js" %}"></script>
 {% endblock %}
 
 

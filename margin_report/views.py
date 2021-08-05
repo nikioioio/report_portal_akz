@@ -104,6 +104,8 @@ def upload_files(request):
             return HttpResponse('При загрузке Файла произошла ошибка')
 
 
+
+
 @csrf_exempt
 def test_get_json(request):
     if request.method == 'POST':

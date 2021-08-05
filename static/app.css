@@ -133,7 +133,7 @@ h1,h2,h3,h4,h5,h6{
 
 .footer{
     position: fixed;
-    padding-left: 90%;
+    padding-left: 5vh;
     bottom: 0;
     padding-bottom: 5vh;
     color: #f05d22;

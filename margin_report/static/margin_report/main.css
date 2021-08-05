@@ -140,3 +140,12 @@ input {
 
 #left  { float:left;  }
 #right { float:right; }
+
+
+#container{
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    width: 100%;
+}
