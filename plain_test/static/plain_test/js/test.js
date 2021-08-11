@@ -123,6 +123,14 @@ function genMain(json) {
         let inp = document.createElement('input');
         inp.className = 'size'
         inp.value = json[key][0]
+
+        let arrrrr_ = ["Тушка"]
+
+        if(!arrrrr_.indexOf( key ) != -1){
+            inp.setAttribute('disabled', 'disabled')
+        }
+
+
         inp.setAttribute('data-path', [key])
 
         inp.addEventListener('blur', function (e) {
