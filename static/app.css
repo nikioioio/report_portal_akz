@@ -37,7 +37,7 @@ h1,h2,h3,h4,h5,h6{
 
 .container{
     width: 100%;
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
 }
 
@@ -127,7 +127,7 @@ h1,h2,h3,h4,h5,h6{
 .intro__inner{
     padding-top: 200px;
     width: 100%;
-    max-width: 880px;
+    /*max-width: 880px;*/
     margin: 0 auto;
 }
 

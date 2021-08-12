@@ -45,3 +45,14 @@ def update(request):
         print(json_obg)
         return JsonResponse({'status':200})
 
+
+
+@csrf_exempt
+def get_table(request):
+    js = request.POST['data1']
+
+    print(js)
+
+    json = {0:['Параметр','Объем заявлено','Объем исполнено'],1:['Вход мясо',1646,646545],2:['Исполнено заказа',1646,646545]}
+    return JsonResponse(json)
+

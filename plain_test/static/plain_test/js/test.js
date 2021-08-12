@@ -42,7 +42,7 @@ function get_arr() {
             upgrage_chast.addEventListener('click', function () {
 
                 var data1 = new FormData()
-                data1.append('data1',JSON.stringify(json))
+                data1.append('data1', JSON.stringify(json))
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', 'update/');
                 // xhr.setRequestHeader('Content-Type', "application/json");
@@ -56,6 +56,15 @@ function get_arr() {
                 }
 
                 xhr.send(data1);
+
+
+            })
+
+            let getTable = document.getElementById('get_table')
+
+            getTable.addEventListener('click', function () {
+
+                get_arr1()
 
 
             })
@@ -85,12 +94,12 @@ function dump_prod(json, etalon, arr_keys) {
     arr_keys.forEach(function (item, i, arr) {
         for (var key in json) {
 
-            for (key_ in json[key][2]){
+            for (key_ in json[key][2]) {
                 if (typeof json[key][2][key_][item.textContent] != "undefined") {
                     // json[key][2][key_][item.textContent] = etalon[key][2][key_][item.textContent]
                     json[key][2][key_][item.textContent][0] = parseInt(etalon[key][2][key_][item.textContent][0])
 
-                    for (var p in etalon[key][2][key_][item.textContent][2]){
+                    for (var p in etalon[key][2][key_][item.textContent][2]) {
                         json[key][2][key_][item.textContent][2][p][0] = parseInt(etalon[key][2][key_][item.textContent][2][p][0])
                     }
 
@@ -126,7 +135,7 @@ function genMain(json) {
 
         let arrrrr_ = ["Тушка"]
 
-        if(!arrrrr_.indexOf( key ) != -1){
+        if (!arrrrr_.indexOf(key) != -1) {
             inp.setAttribute('disabled', 'disabled')
         }
 
@@ -190,7 +199,7 @@ function genProduct(json, val_ch, global_json) {
             let inp = document.createElement('input');
             inp.className = 'size'
             inp.value = json[key____][key][0]
-            inp.setAttribute('data-path', [val_ch, key____, 0,key])
+            inp.setAttribute('data-path', [val_ch, key____, 0, key])
 
             inp.addEventListener('blur', function (e) {
                 let targ = e.target
@@ -264,6 +273,61 @@ function genProduct(json, val_ch, global_json) {
 }
 
 
+function get_arr1() {
+    var arr = JSON.stringify({'email': 'tomb@raider.com', 'name': 'LaraCroft'});
+    var data1 = new FormData()
+    data1.append('data1', arr)
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', 'get_table/');
+    // xhr.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    // xhr.responseType = "application/json";
+    xhr.onload = function (e) {
+
+        if (this.status == 200) {
+            $('.table_dark').remove()
+            let json = JSON.parse(xhr.response)
+
+            let table = document.createElement('table');
+
+            table.className = 'table_dark'
+
+            for (let key in json) {
+                let tr = document.createElement('tr');
+                if (key > 0) {
+                    for (let key_ in json[key]) {
+                        // console.log(json[key][key_])
+                        let td = document.createElement('td');
+                        td.textContent = json[key][key_]
+                        tr.appendChild(td)
+                    }
+
+                }else{
+                    for (let key_ in json[key]) {
+                        // console.log(json[key][key_])
+                        let th = document.createElement('th');
+                        th.textContent = json[key][key_]
+                        tr.appendChild(th)
+                    }
+
+                }
 
 
+            table.appendChild(tr)
+
+                // console.log(json[key])
+            }
+
+
+            $('.intro__inner').append(table)
+
+        } else {
+        }
+    }
+    // xhr.onerror = function (ev){
+    //     alert('Формирование заверщилось ошибкой')
+    // }
+
+    xhr.send(data1);
+
+}
 
