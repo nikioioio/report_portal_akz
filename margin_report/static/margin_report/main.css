@@ -18,8 +18,10 @@ input {
 
 
 .bullet {
+    width: 50%;
+    margin:0 auto;
 	padding: 0;
-    margin-left: 0;
+    /*margin-left: 0;*/
     list-style: none;
     counter-reset: li;
 }
@@ -47,6 +49,12 @@ input {
     border-radius: 50%;
     counter-increment: li;
     /*content: counter(li);*/
+}
+
+.center_els{
+    width: 50%;
+    margin:0 auto;
+	padding: 0;
 }
 
 .border-button {
@@ -143,6 +151,7 @@ input {
 
 
 #container{
+    margin-top: 50px;
     position: absolute;
     left: 0;
     right: 0;
