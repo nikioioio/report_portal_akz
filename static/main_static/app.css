@@ -10,7 +10,7 @@ body {
     font-size: 15px;
     color: #333;
     line-height: 1.6;
-    background: url(../static/images/back_color.jpg) center no-repeat fixed;
+    background: url(images/back_color.jpg) center no-repeat fixed;
     background-size: cover;
     width: 100%;
     /*background-size: cover;*/
