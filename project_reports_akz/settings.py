@@ -136,6 +136,6 @@ STATICFILES_DIRS = [
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
