@@ -1,4 +1,5 @@
 import os
+import logging
 from io import StringIO, BytesIO
 from modules.margin_report.module_ssmp import get_ssmp_ukpf
 
@@ -16,7 +17,7 @@ from modules.margin_report.builtin_functions import generate_exlx_for_ajax,gener
 from modules.margin_report.perralel_read_files import get_files
 
 import base64
-
+logger = logging.getLogger(__name__)
 # Показ стартовой страницы по маржинальности
 def starting_page(request):
     title = 'Margin Report'
@@ -94,6 +95,7 @@ def upload_files(request):
                 prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
 
             except Exception as e:
+                logger.error(str(e.__cause__).encode())
                 return JsonResponse({'error': str(e.__cause__).encode().decode('utf-8', 'ignore'),
                                      'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
