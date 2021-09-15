@@ -34,7 +34,7 @@ def upload_files(request):
     #     # raise TypeError('hi')
     # except Exception as e:
     #     return HttpResponse(e.args,status=500)
-    pool = Pool(processes=2)
+    pool = Pool(processes=4)
     if request.method == 'POST':
         try:
 
@@ -108,9 +108,9 @@ def upload_files(request):
                                         (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
                                         (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
 
-
+                pool = Pool(processes=4)
                 df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
-
+                pool.close()
 
                 ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
                                                                                            ost_UKPF,
@@ -125,8 +125,9 @@ def upload_files(request):
                                       (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
                                       (df_amort, 'Амортизация', 0, int(year_), int(month_))]
 
-
+                pool = Pool(processes=4)
                 df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
+                pool.close()
                 #
                 #
                 ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
