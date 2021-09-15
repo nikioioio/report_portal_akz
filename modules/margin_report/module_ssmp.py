@@ -4,6 +4,7 @@ import datetime
 import calendar
 from modules.margin_report.builtin_functions import retype_index,retype_multiindex,get_current_data,dict_keys,rev_to_dict,insert_vpr,input_proc_packaging,restruct_multitindex
 import warnings
+import numpy as np
 warnings.filterwarnings('ignore')
 
 
@@ -289,6 +290,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
         #             return part_1_cons_2_per_product
         # #             return get_mmo(curr_mmo,df_for_mo_mapping)
 
+        part_1_cons_1_per.replace([np.inf, -np.inf], np.nan, inplace=True)
+        part_1_cons_2_per_product.replace([np.inf, -np.inf], np.nan, inplace=True)
         per_1[current_month] = part_1_cons_1_per
         per_2[current_month] = part_1_cons_2_per_product
 
@@ -784,6 +787,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                'Итого с/c с прямыми расходами тыс. тг'] + \
                                                            curr_Production_output_UKPF['Итого накладная с/с тыс. тг']
 
+        curr_Production_output_UKPF['C/c мясосырья, Агро тг/кг'] = 0
+
         curr_Production_output_UKPF['Итого с/c тг/кг'] = curr_Production_output_UKPF.apply(
             lambda x: 0 if x[current_month] == 0 else x['Итого с/c тыс. тг'] / \
                                                       x[current_month] * 1000, axis=1)
@@ -792,6 +797,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
         #             return curr_Production_output_UKPF
 
         #    Записали в словарь
+        curr_Production_output_UKPF.replace([np.inf, -np.inf], np.nan, inplace=True)
         cons_pr[current_month] = curr_Production_output_UKPF
 
         # таблица с остатками
@@ -839,7 +845,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
             # production_for_join_ost блок с выпуском (он будет актуальным)
 
             it = pd.concat([cons_ost_start, production_for_join_ost], axis=1)
-
+            it.fillna(0, inplace=True)
 
         else:
             path_ost_nach = ('Остаток', prev_month)
@@ -885,8 +891,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
 
         # -----------------------------------
 
-        items = ['C/c мясосырья, Птицеводство тг/кг', 'Специи, добавки тг/кг', 'Упаковочный материал тг/кг',
-                 'Затраты на убой и потрошение тг/кг',
+        items = ['C/c мясосырья, Птицеводство тг/кг', 'C/c мясосырья, Агро тг/кг', 'Специи, добавки тг/кг',
+                 'Упаковочный материал тг/кг', 'Затраты на убой и потрошение тг/кг',
                  'Затраты на разделку тг/кг', 'Затраты на охлаждение тг/кг', 'Затраты на заморозку тг/кг',
                  'Затраты на Индив. пакет тг/кг',
                  'Затраты на Подложку тг/кг', 'Затраты на Групп. Пакет тг/кг', 'Затраты на Маринацию тг/кг',
@@ -905,6 +911,8 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                                                                          1],
                                                                                                                      'Объем кг')])
 
+        #         if ind___+1==2:
+        #             return it
         # -----------------------------------
 
         it.loc[:, (path_r[0], path_r[1], 'Итого с/c с прямыми расходами тг/кг')] = it.loc[:, (path_r[0], path_r[1],
@@ -912,7 +920,9 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                                    it.loc[:, (path_r[0], path_r[1],
                                                                                               'Специи, добавки тг/кг')] + \
                                                                                    it.loc[:, (path_r[0], path_r[1],
-                                                                                              'Упаковочный материал тг/кг')]
+                                                                                              'Упаковочный материал тг/кг')] + \
+                                                                                   it.loc[:, (path_r[0], path_r[1],
+                                                                                              'C/c мясосырья, Агро тг/кг')]
 
         # -----------------------------------
 
@@ -950,6 +960,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
         it = it.set_index('Артикул')
         it = pd.concat([it, arr_ost_kon], axis=1)
         it = it.reset_index()
+        it.fillna(0, inplace=True)
 
         # -----------------------------------
 
@@ -1001,7 +1012,12 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                                                               0],
                                                                                                           path_ost_kon[
                                                                                                               1],
-                                                                                                          'Упаковочный материал тг/кг')]
+                                                                                                          'Упаковочный материал тг/кг')] + \
+                                                                                               it.loc[:, (path_ost_kon[
+                                                                                                              0],
+                                                                                                          path_ost_kon[
+                                                                                                              1],
+                                                                                                          'C/c мясосырья, Агро тг/кг')]
 
         # -----------------------------------
 
@@ -1040,6 +1056,7 @@ def get_ssmp_ukpf(*args): # параллельный вызов
                                                                            it.loc[:, (path_ost_kon[0], path_ost_kon[1],
                                                                                       'Итого с/c с прямыми расходами тг/кг')]
 
+        it.replace([np.inf, -np.inf], np.nan, inplace=True)
         if ind___ + 1 == mon:
             return cons_pr, it, per_1, per_2
 

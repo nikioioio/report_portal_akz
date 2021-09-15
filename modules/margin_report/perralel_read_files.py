@@ -54,6 +54,26 @@ def replace_to_correct_datetime_erarh(df,year_report,month_report,sheet_name):
 
     return df
 
+def findind_date(df,year,month):
+    iter_months = [datetime.datetime(int(year), x, calendar.monthrange(year, x)[1], 0, 0) for x in
+                   range(1, int(month) + 1)]
+    count_month = sum([iter_months.count(x) for x in  df.columns])
+    if count_month==0:
+        return True
+    if count_month==month:
+        return True
+    else:
+        return False
+
+# def findImportantCol(df,col,filename):
+#     if filename == 'Mapping.xlsx':
+#         return True
+#     if col in df.columns:
+#         return True
+#     else:
+#         return False
+
+
 
 # функция для параллельного считывания файлов
 # args: file, list, sheetname,year,month
@@ -64,8 +84,19 @@ def get_files(*args):
     if args[0][2] == 0:
         df = pd.read_excel(args[0][0], sheet_name=args[0][1])
         df = replace_to_correct_datetime(df,args[0][3],args[0][4],args[0][1],args[0][0])
+        # проверка на наличие столбцов с датами
+        if findind_date(df,args[0][3],args[0][4]) == False:
+            raise Exception('На листе "' + str(args[0][1]) + '" Файла "' + str(args[0][0]) + '" присутствуют не все столбцы с датами (или они имеют не верный формат)')
+        # if findImportantCol(df,'Артикул',args[0][0]) == False:
+        #     raise Exception('На листе "' + str(args[0][1]) + '" Файла "' + str(
+        #         args[0][0]) + '" Отсутствует столбец Артикул или он написан не верно' )
         return df
     else:
         df = pd.read_excel(args[0][0], sheet_name=args[0][1],header=args[0][2])
         df = replace_to_correct_datetime_erarh(df,args[0][3],args[0][4],args[0][1])
+        if findind_date(df,args[0][3],args[0][4]) == False:
+            raise Exception('На листе '+args[0][1]+ ' Файла ' + args[0][0]+ ' присутствуют не все столбцы с датами (или они имеют не верный формат)')
+        # if findImportantCol(df,'Артикул',args[0][0]) == False:
+        #     raise Exception('На листе "' + str(args[0][1]) + '" Файла "' + str(
+        #         args[0][0]) + '" Отсутствует столбец Артикул или он написан не верно' )
         return df
