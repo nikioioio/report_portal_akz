@@ -222,7 +222,7 @@ def save_iter_month_xlsx(writer,df,iter_months,name):
         pass
     return writer
 # формирование ответа на фронт с файлом.
-def generate_exlx_for_ajax(year_report,ost_MPF):
+def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d):
 
     iter_months = [datetime.datetime(year_report, x, calendar.monthrange(year_report, x)[1], 0, 0) for x in
                    range(1, 13)]
@@ -231,19 +231,19 @@ def generate_exlx_for_ajax(year_report,ost_MPF):
 
     # Возврат на frontend файла excel
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    # writer = save_iter_month_xlsx(writer, ss_sku, iter_months, 'Итоговая себестоимость SKU')
-    # writer = save_iter_month_xlsx(writer, per_1_mpf, iter_months, 'Первый передел МПФ')
-    # writer = save_iter_month_xlsx(writer, per_2_mpf, iter_months, 'Второй передел МПФ')
-    # writer = save_iter_month_xlsx(writer, per_1_UKPF, iter_months, 'Первый передел УКПФ')
-    # writer = save_iter_month_xlsx(writer, per_2_UKPF, iter_months, 'Второй передел УКПФ')
-    # writer = save_iter_month_xlsx(writer, prod_MPF, iter_months, 'Себес. мяса МПФ')
-    # writer = save_iter_month_xlsx(writer, prod_UKPF, iter_months, 'Себес. мяса УКПФ')
-    # writer = save_iter_month_xlsx(writer, zak_u_amd_amp, iter_months, 'Закуп у амд часть амп')
-    # writer = save_iter_month_xlsx(writer, sebes_real_pr_AMD, iter_months, 'Себес.реализ.продукции амп')
+    writer = save_iter_month_xlsx(writer, ss_sku, iter_months, 'Итоговая себестоимость SKU')
+    writer = save_iter_month_xlsx(writer, per_1_mpf, iter_months, 'Первый передел МПФ')
+    writer = save_iter_month_xlsx(writer, per_2_mpf, iter_months, 'Второй передел МПФ')
+    writer = save_iter_month_xlsx(writer, per_1_UKPF, iter_months, 'Первый передел УКПФ')
+    writer = save_iter_month_xlsx(writer, per_2_UKPF, iter_months, 'Второй передел УКПФ')
+    writer = save_iter_month_xlsx(writer, prod_MPF, iter_months, 'Себес. мяса МПФ')
+    writer = save_iter_month_xlsx(writer, prod_UKPF, iter_months, 'Себес. мяса УКПФ')
+    writer = save_iter_month_xlsx(writer, zak_u_amd_amp, iter_months, 'Закуп у амд часть амп')
+    writer = save_iter_month_xlsx(writer, sebes_real_pr_AMD, iter_months, 'Себес.реализ.продукции амп')
     ost_MPF.to_excel(writer, sheet_name='Остатки МПФ')
-    # ost_UKPF.to_excel(writer, sheet_name='Остатки УКПФ')
-    # ost_AMD.to_excel(writer, sheet_name='Остатки АМД')
-    # ost_AMP_d.to_excel(writer, sheet_name='Остатки АМП')
+    ost_UKPF.to_excel(writer, sheet_name='Остатки УКПФ')
+    ost_AMD.to_excel(writer, sheet_name='Остатки АМД')
+    ost_AMP_d.to_excel(writer, sheet_name='Остатки АМП')
 
     writer.save()
 
