@@ -155,7 +155,7 @@ def upload_files(request):
                 df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
                 pool.close()
                 #
-                # ss_sku = get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, int(month_), int(year_), df_list_ss_sku_itog,global_index)
+                ss_sku = get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, int(month_), int(year_), df_list_ss_sku_itog,global_index)
 
 
             except Exception as e:
