@@ -110,7 +110,7 @@ def upload_files(request):
 
 
                 df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
-                pool.close()
+
 
                 ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
                                                                                            ost_UKPF,
@@ -127,7 +127,7 @@ def upload_files(request):
 
 
                 df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
-                pool.close()
+
 
                 ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
                                                                                                        budj_AMD,
