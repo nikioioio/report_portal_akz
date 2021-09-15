@@ -56,24 +56,24 @@ function get_val() {
     data1.append('year', $('#year_').val());
     data1.append('month', $('#month_').val());
 
-    // const arrControl = Array.from(data1).map(el => el[1].name)
-    //
-    //
-    // const controlFileFunc = () => {
-    //     for (let i = 0; i < controlFiles.length; i++) {
-    //         if (arrControl.indexOf(controlFiles[i]) === -1) {
-    //             alert('Отсутсвует файл ' + controlFiles[i] + ' ,добавьте его')
-    //             return false
-    //         }
-    //
-    //     }
-    //     return true
-    // }
-    //
-    //
-    // if(!controlFileFunc()){
-    //     return;
-    // }
+    const arrControl = Array.from(data1).map(el => el[1].name)
+
+
+    const controlFileFunc = () => {
+        for (let i = 0; i < controlFiles.length; i++) {
+            if (arrControl.indexOf(controlFiles[i]) === -1) {
+                alert('Отсутсвует файл ' + controlFiles[i] + ' ,добавьте его')
+                return false
+            }
+
+        }
+        return true
+    }
+
+
+    if(!controlFileFunc()){
+        return;
+    }
 
 
     // console.log(pr)
