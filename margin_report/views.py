@@ -97,48 +97,48 @@ def upload_files(request):
 
                 pool.close()
 
-                # prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
-                #
-                # prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
-                # # amd_sebes
-                # arrs_for_amd_sebes = [  (df_ost_amd, 'Sheet1', 'ost_nach', int(year_), int(month_)),
-                #                         (df_amp_and_amd, 'Продажи бюдж', [0, 1], int(year_), int(month_)),
-                #                         (df_amp_and_amd, 'Остатки АМД', [0, 1], int(year_), int(month_)),
-                #                         (df_amp_and_amd, 'Отчет СС АМП', [0, 1, 2], int(year_), int(month_)),
-                #                         (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
-                #                         (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
-                #
-                #
-                # df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
-                #
-                #
-                # ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
-                #                                                                            ost_UKPF,
-                #                                                                            prod_MPF,
-                #                                                                            ost_MPF,
-                #                                                                            int(year_),
-                #                                                                            df_list_amd,
-                #                                                                            int(month_),
-                #                                                                            global_index)
+                prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
+
+                prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
+                # amd_sebes
+                arrs_for_amd_sebes = [  (df_ost_amd, 'Sheet1', 'ost_nach', int(year_), int(month_)),
+                                        (df_amp_and_amd, 'Продажи бюдж', [0, 1], int(year_), int(month_)),
+                                        (df_amp_and_amd, 'Остатки АМД', [0, 1], int(year_), int(month_)),
+                                        (df_amp_and_amd, 'Отчет СС АМП', [0, 1, 2], int(year_), int(month_)),
+                                        (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
+                                        (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
+
+
+                df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
+
+
+                ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
+                                                                                           ost_UKPF,
+                                                                                           prod_MPF,
+                                                                                           ost_MPF,
+                                                                                           int(year_),
+                                                                                           df_list_amd,
+                                                                                           int(month_),
+                                                                                           global_index)
                 # # get_ss_amp
-                # arrs_for_amp_sebes = [(df_ost_amp, 'Sheet1', 'ost_nach', int(year_), int(month_)),
-                #                       (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
-                #                       (df_amort, 'Амортизация', 0, int(year_), int(month_))]
+                arrs_for_amp_sebes = [(df_ost_amp, 'Sheet1', 'ost_nach', int(year_), int(month_)),
+                                      (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
+                                      (df_amort, 'Амортизация', 0, int(year_), int(month_))]
+
+
+                df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
                 #
                 #
-                # df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
-                #
-                #
-                # ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
-                #                                                                                        budj_AMD,
-                #                                                                                        global_index,
-                #                                                                                        int(year_),
-                #                                                                                        bolv,
-                #                                                                                        ost_AMD,
-                #                                                                                        sebes_amp,
-                #                                                                                        df_list_amp,
-                #                                                                                        ost_AMP,
-                #                                                                                        sebes_amp_new)
+                ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
+                                                                                                       budj_AMD,
+                                                                                                       global_index,
+                                                                                                       int(year_),
+                                                                                                       bolv,
+                                                                                                       ost_AMD,
+                                                                                                       sebes_amp,
+                                                                                                       df_list_amp,
+                                                                                                       ost_AMP,
+                                                                                                       sebes_amp_new)
                 #
                 #
                 # #     get_ss_sku
