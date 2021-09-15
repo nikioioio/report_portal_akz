@@ -71,149 +71,149 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
 
         print(current_month)
 
-        curr_budj = \
-        get_current_data(budj_AMD.reset_index().set_index(['Артикул', 'канал']), global_index, current_month)[
-            current_month].reset_index()
-        curr_cost_amp = get_current_data(cost_amp, global_index, current_month)[current_month].sum()
-        curr_cost_amd = get_current_data(cost_amd.set_index(['map2', 'map3']), global_index, current_month)[
-            current_month].reset_index()
-        curr_cost_ukpf = get_current_data(cost_ukpf.set_index('Наименование показателя'), global_index, current_month)[
-            current_month].reset_index()
-        curr_cost_mpf = get_current_data(cost_mpf.set_index('Наименование показателя'), global_index, current_month)[
-            current_month].reset_index()
-        curr_adm_cost_AMP = get_current_data(adm_cost_AMP.set_index('ОАР АМП'), global_index, current_month)[
-            current_month].reset_index()
-        curr_adm_cost_AMD = get_current_data(adm_cost_AMD.set_index('ОАР АМД'), global_index, current_month)[
-            current_month].reset_index()
+        # curr_budj = \
+        # get_current_data(budj_AMD.reset_index().set_index(['Артикул', 'канал']), global_index, current_month)[
+        #     current_month].reset_index()
+        # curr_cost_amp = get_current_data(cost_amp, global_index, current_month)[current_month].sum()
+        # curr_cost_amd = get_current_data(cost_amd.set_index(['map2', 'map3']), global_index, current_month)[
+        #     current_month].reset_index()
+        # curr_cost_ukpf = get_current_data(cost_ukpf.set_index('Наименование показателя'), global_index, current_month)[
+        #     current_month].reset_index()
+        # curr_cost_mpf = get_current_data(cost_mpf.set_index('Наименование показателя'), global_index, current_month)[
+        #     current_month].reset_index()
+        # curr_adm_cost_AMP = get_current_data(adm_cost_AMP.set_index('ОАР АМП'), global_index, current_month)[
+        #     current_month].reset_index()
+        # curr_adm_cost_AMD = get_current_data(adm_cost_AMD.set_index('ОАР АМД'), global_index, current_month)[
+        #     current_month].reset_index()
+        #
+        # #         блок продажи
+        # stock = template_for_ss_sku[['Артикул', 'канал']].copy()
+        #
+        # def func(x, df, col):
+        #     return df[(df['канал'] == x['канал']) & (df['Артикул'] == x['Артикул'])][col].sum()
+        #
+        # stock['Объем кг'] = stock.apply(lambda x: func(x, curr_budj, 'Кол-во'), axis=1)
+        #
+        # stock['Цена тг/кг'] = stock.apply(lambda x: func(x, curr_budj, 'Сумма'), axis=1) / stock['Объем кг']
+        # stock = stock.set_index(['Артикул', 'канал'])
+        #
+        # ml = pd.MultiIndex.from_tuples([('Продажи', x) for x in stock.columns])
+        # stock.columns = ml
+        #
+        # #         блок себестоимость
+        #
+        # sebes = template_for_ss_sku[['Артикул', 'канал']].copy()
+        # current_rash_AMD = ost_AMD.set_index('Артикул')['Расход'][current_month].copy().reset_index()
+        # current_rash_AMP = ost_AMP_d.set_index('Артикул')['Расход'][current_month].copy().reset_index()
+        #
+        # all_ = current_rash_AMD.append(current_rash_AMP)
+        #
+        # cols_sum = []
+        # for col in all_.set_index('Артикул').columns:
+        #
+        #     if col != 'Объем кг' and col.find('Итого') == -1:
+        #         def func(x, df, col__):
+        #             return df[df['Артикул'] == x['Артикул']][col__].sum()
+        #
+        #         sebes[col] = sebes.apply(lambda x: func(x, all_, col), axis=1)
+        #         cols_sum.append(col)
+        #
+        # sebes['Итого тг/кг'] = sebes[cols_sum].sum(axis=1)
+        # sebes = sebes.set_index(['Артикул', 'канал'])
+        #
+        # ml = pd.MultiIndex.from_tuples([('Себестоимость', x) for x in sebes.columns])
+        # sebes.columns = ml
+        #
+        # stock_sebes = pd.concat([stock, sebes], axis=1)
+        # stock_sebes = stock_sebes.reset_index()
+        #
+        # #         Блок расходы по реализации
+        #
+        # # ---------------------------------------------------
+        #
+        # def func(x, df):
+        #     if x['канал'][0] == 'ОПТ АМП':
+        #         return curr_cost_amp * (
+        #                     x['Продажи']['Объем кг'] / df[df['канал'] == 'ОПТ АМП']['Продажи']['Объем кг'].sum())
+        #     else:
+        #         return 0
 
-        #         блок продажи
-        stock = template_for_ss_sku[['Артикул', 'канал']].copy()
-
-        def func(x, df, col):
-            return df[(df['канал'] == x['канал']) & (df['Артикул'] == x['Артикул'])][col].sum()
-
-        stock['Объем кг'] = stock.apply(lambda x: func(x, curr_budj, 'Кол-во'), axis=1)
-
-        stock['Цена тг/кг'] = stock.apply(lambda x: func(x, curr_budj, 'Сумма'), axis=1) / stock['Объем кг']
-        stock = stock.set_index(['Артикул', 'канал'])
-
-        ml = pd.MultiIndex.from_tuples([('Продажи', x) for x in stock.columns])
-        stock.columns = ml
-
-        #         блок себестоимость
-
-        sebes = template_for_ss_sku[['Артикул', 'канал']].copy()
-        current_rash_AMD = ost_AMD.set_index('Артикул')['Расход'][current_month].copy().reset_index()
-        current_rash_AMP = ost_AMP_d.set_index('Артикул')['Расход'][current_month].copy().reset_index()
-
-        all_ = current_rash_AMD.append(current_rash_AMP)
-
-        cols_sum = []
-        for col in all_.set_index('Артикул').columns:
-
-            if col != 'Объем кг' and col.find('Итого') == -1:
-                def func(x, df, col__):
-                    return df[df['Артикул'] == x['Артикул']][col__].sum()
-
-                sebes[col] = sebes.apply(lambda x: func(x, all_, col), axis=1)
-                cols_sum.append(col)
-
-        sebes['Итого тг/кг'] = sebes[cols_sum].sum(axis=1)
-        sebes = sebes.set_index(['Артикул', 'канал'])
-
-        ml = pd.MultiIndex.from_tuples([('Себестоимость', x) for x in sebes.columns])
-        sebes.columns = ml
-
-        stock_sebes = pd.concat([stock, sebes], axis=1)
-        stock_sebes = stock_sebes.reset_index()
-
-        #         Блок расходы по реализации
-
-        # ---------------------------------------------------
-
-        def func(x, df):
-            if x['канал'][0] == 'ОПТ АМП':
-                return curr_cost_amp * (
-                            x['Продажи']['Объем кг'] / df[df['канал'] == 'ОПТ АМП']['Продажи']['Объем кг'].sum())
-            else:
-                return 0
-
-        stock_sebes.loc[:, ('Расходы по реализации', 'РР АМП (ГП)')] = stock_sebes.apply(lambda x: func(x, stock_sebes),
-                                                                                         axis=1) / \
-                                                                       stock_sebes['Продажи']['Объем кг'] * 1000
-
-        # ---------------------------------------------------
-
-        def func(x, df, df1, channel, pr_cost):
-            #             if x['канал'][0]=='Кейтеринг':
-            prod = x['Продажи']['Объем кг']
-            a = (df1[(df1['map2'] == channel) & (df1['map3'] == pr_cost)][current_month].sum() / 1000) * prod / \
-                df[df['канал'] == channel]['Продажи']['Объем кг'].sum() / prod * 1000
-
-            b = prod / (df['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи']['Объем кг'].sum()) * \
-                (df1[(df1['map2'] == 'на все каналы') & (df1['map3'] == pr_cost)][
-                     current_month].sum() / 1000) / prod * 1000
-
-            return a + b
-
-        stock_sebes.loc[:, ('Расходы по реализации', 'Логистика тг/кг')] = stock_sebes.apply(lambda x: func(x,
-                                                                                                            stock_sebes,
-                                                                                                            curr_cost_amd,
-                                                                                                            x['канал'][
-                                                                                                                0],
-                                                                                                            'Логистика'),
-                                                                                             axis=1)
-
-        stock_sebes.loc[:, ('Расходы по реализации', 'Дистрибуция тг/кг')] = stock_sebes.apply(lambda x: func(x,
-                                                                                                              stock_sebes,
-                                                                                                              curr_cost_amd,
-                                                                                                              x[
-                                                                                                                  'канал'][
-                                                                                                                  0],
-                                                                                                              'Дистрибуция'),
-                                                                                               axis=1)
-        stock_sebes.loc[:, ('Расходы по реализации', 'Маркетинг тг/кг')] = stock_sebes.apply(lambda x: func(x,
-                                                                                                            stock_sebes,
-                                                                                                            curr_cost_amd,
-                                                                                                            x['канал'][
-                                                                                                                0],
-                                                                                                            'Маркетинг'),
-                                                                                             axis=1)
-
-        stock_sebes.loc[:, ('Расходы по реализации', 'Прочее (ЗПП+АМД) тг/кг')] = stock_sebes.apply(lambda x: func(x,
-                                                                                                                   stock_sebes,
-                                                                                                                   curr_cost_amd,
-                                                                                                                   x[
-                                                                                                                       'канал'][
-                                                                                                                       0],
-                                                                                                                   'Прочее'),
-                                                                                                    axis=1)
-
-        def func(x, df, df1, pr_cost, stock_sebes):
-
-            if x['канал'][0] != 'АМП пром':
-                prod = x['Продажи']['Объем кг']
-                a = prod / (stock_sebes['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи'][
-                    'Объем кг'].sum()) * \
-                    curr_cost_mpf[curr_cost_mpf['Наименование показателя'] == pr_cost][
-                        current_month].sum() / prod * 1000
-
-                b = prod / (stock_sebes['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи'][
-                    'Объем кг'].sum()) * \
-                    curr_cost_ukpf[curr_cost_ukpf['Наименование показателя'] == pr_cost][
-                        current_month].sum() / prod * 1000
-
-                return a + b
-
-        stock_sebes.loc[:, ('Расходы по реализации', 'Прочее (ЗПП+АМД) тг/кг')] = stock_sebes.loc[:, (
-                                                                                                     'Расходы по реализации',
-                                                                                                     'Прочее (ЗПП+АМД) тг/кг')] + \
-                                                                                  stock_sebes.apply(lambda x: func(x,
-                                                                                                                   stock_sebes,
-                                                                                                                   curr_cost_amd,
-                                                                                                                   'Прочее',
-                                                                                                                   stock_sebes),
-                                                                                                    axis=1)
+        # stock_sebes.loc[:, ('Расходы по реализации', 'РР АМП (ГП)')] = stock_sebes.apply(lambda x: func(x, stock_sebes),
+        #                                                                                  axis=1) / \
+        #                                                                stock_sebes['Продажи']['Объем кг'] * 1000
+        #
+        # # ---------------------------------------------------
+        #
+        # def func(x, df, df1, channel, pr_cost):
+        #     #             if x['канал'][0]=='Кейтеринг':
+        #     prod = x['Продажи']['Объем кг']
+        #     a = (df1[(df1['map2'] == channel) & (df1['map3'] == pr_cost)][current_month].sum() / 1000) * prod / \
+        #         df[df['канал'] == channel]['Продажи']['Объем кг'].sum() / prod * 1000
+        #
+        #     b = prod / (df['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи']['Объем кг'].sum()) * \
+        #         (df1[(df1['map2'] == 'на все каналы') & (df1['map3'] == pr_cost)][
+        #              current_month].sum() / 1000) / prod * 1000
+        #
+        #     return a + b
+        #
+        # stock_sebes.loc[:, ('Расходы по реализации', 'Логистика тг/кг')] = stock_sebes.apply(lambda x: func(x,
+        #                                                                                                     stock_sebes,
+        #                                                                                                     curr_cost_amd,
+        #                                                                                                     x['канал'][
+        #                                                                                                         0],
+        #                                                                                                     'Логистика'),
+        #                                                                                      axis=1)
+        #
+        # stock_sebes.loc[:, ('Расходы по реализации', 'Дистрибуция тг/кг')] = stock_sebes.apply(lambda x: func(x,
+        #                                                                                                       stock_sebes,
+        #                                                                                                       curr_cost_amd,
+        #                                                                                                       x[
+        #                                                                                                           'канал'][
+        #                                                                                                           0],
+        #                                                                                                       'Дистрибуция'),
+        #                                                                                        axis=1)
+        # stock_sebes.loc[:, ('Расходы по реализации', 'Маркетинг тг/кг')] = stock_sebes.apply(lambda x: func(x,
+        #                                                                                                     stock_sebes,
+        #                                                                                                     curr_cost_amd,
+        #                                                                                                     x['канал'][
+        #                                                                                                         0],
+        #                                                                                                     'Маркетинг'),
+        #                                                                                      axis=1)
+        #
+        # stock_sebes.loc[:, ('Расходы по реализации', 'Прочее (ЗПП+АМД) тг/кг')] = stock_sebes.apply(lambda x: func(x,
+        #                                                                                                            stock_sebes,
+        #                                                                                                            curr_cost_amd,
+        #                                                                                                            x[
+        #                                                                                                                'канал'][
+        #                                                                                                                0],
+        #                                                                                                            'Прочее'),
+        #                                                                                             axis=1)
+        #
+        # def func(x, df, df1, pr_cost, stock_sebes):
+        #
+        #     if x['канал'][0] != 'АМП пром':
+        #         prod = x['Продажи']['Объем кг']
+        #         a = prod / (stock_sebes['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи'][
+        #             'Объем кг'].sum()) * \
+        #             curr_cost_mpf[curr_cost_mpf['Наименование показателя'] == pr_cost][
+        #                 current_month].sum() / prod * 1000
+        #
+        #         b = prod / (stock_sebes['Продажи']['Объем кг'].sum() - df[df['канал'] == 'АМП пром']['Продажи'][
+        #             'Объем кг'].sum()) * \
+        #             curr_cost_ukpf[curr_cost_ukpf['Наименование показателя'] == pr_cost][
+        #                 current_month].sum() / prod * 1000
+        #
+        #         return a + b
+        #
+        # stock_sebes.loc[:, ('Расходы по реализации', 'Прочее (ЗПП+АМД) тг/кг')] = stock_sebes.loc[:, (
+        #                                                                                              'Расходы по реализации',
+        #                                                                                              'Прочее (ЗПП+АМД) тг/кг')] + \
+        #                                                                           stock_sebes.apply(lambda x: func(x,
+        #                                                                                                            stock_sebes,
+        #                                                                                                            curr_cost_amd,
+        #                                                                                                            'Прочее',
+        #                                                                                                            stock_sebes),
+        #                                                                                             axis=1)
 
         # stock_sebes.loc[:, ('Расходы по реализации', 'Итого тг/кг')] = stock_sebes.loc[:,
         #                                                                ('Расходы по реализации', 'Логистика тг/кг')] + \
