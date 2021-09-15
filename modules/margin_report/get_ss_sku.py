@@ -71,61 +71,61 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
 
         print(current_month)
 
-        # curr_budj = \
-        # get_current_data(budj_AMD.reset_index().set_index(['Артикул', 'канал']), global_index, current_month)[
-        #     current_month].reset_index()
-        # curr_cost_amp = get_current_data(cost_amp, global_index, current_month)[current_month].sum()
-        # curr_cost_amd = get_current_data(cost_amd.set_index(['map2', 'map3']), global_index, current_month)[
-        #     current_month].reset_index()
-        # curr_cost_ukpf = get_current_data(cost_ukpf.set_index('Наименование показателя'), global_index, current_month)[
-        #     current_month].reset_index()
-        # curr_cost_mpf = get_current_data(cost_mpf.set_index('Наименование показателя'), global_index, current_month)[
-        #     current_month].reset_index()
-        # curr_adm_cost_AMP = get_current_data(adm_cost_AMP.set_index('ОАР АМП'), global_index, current_month)[
-        #     current_month].reset_index()
-        # curr_adm_cost_AMD = get_current_data(adm_cost_AMD.set_index('ОАР АМД'), global_index, current_month)[
-        #     current_month].reset_index()
-        #
-        # #         блок продажи
-        # stock = template_for_ss_sku[['Артикул', 'канал']].copy()
-        #
-        # def func(x, df, col):
-        #     return df[(df['канал'] == x['канал']) & (df['Артикул'] == x['Артикул'])][col].sum()
-        #
-        # stock['Объем кг'] = stock.apply(lambda x: func(x, curr_budj, 'Кол-во'), axis=1)
-        #
-        # stock['Цена тг/кг'] = stock.apply(lambda x: func(x, curr_budj, 'Сумма'), axis=1) / stock['Объем кг']
-        # stock = stock.set_index(['Артикул', 'канал'])
-        #
-        # ml = pd.MultiIndex.from_tuples([('Продажи', x) for x in stock.columns])
-        # stock.columns = ml
-        #
-        # #         блок себестоимость
-        #
-        # sebes = template_for_ss_sku[['Артикул', 'канал']].copy()
-        # current_rash_AMD = ost_AMD.set_index('Артикул')['Расход'][current_month].copy().reset_index()
-        # current_rash_AMP = ost_AMP_d.set_index('Артикул')['Расход'][current_month].copy().reset_index()
-        #
-        # all_ = current_rash_AMD.append(current_rash_AMP)
-        #
-        # cols_sum = []
-        # for col in all_.set_index('Артикул').columns:
-        #
-        #     if col != 'Объем кг' and col.find('Итого') == -1:
-        #         def func(x, df, col__):
-        #             return df[df['Артикул'] == x['Артикул']][col__].sum()
-        #
-        #         sebes[col] = sebes.apply(lambda x: func(x, all_, col), axis=1)
-        #         cols_sum.append(col)
-        #
-        # sebes['Итого тг/кг'] = sebes[cols_sum].sum(axis=1)
-        # sebes = sebes.set_index(['Артикул', 'канал'])
-        #
-        # ml = pd.MultiIndex.from_tuples([('Себестоимость', x) for x in sebes.columns])
-        # sebes.columns = ml
-        #
-        # stock_sebes = pd.concat([stock, sebes], axis=1)
-        # stock_sebes = stock_sebes.reset_index()
+        curr_budj = \
+        get_current_data(budj_AMD.reset_index().set_index(['Артикул', 'канал']), global_index, current_month)[
+            current_month].reset_index()
+        curr_cost_amp = get_current_data(cost_amp, global_index, current_month)[current_month].sum()
+        curr_cost_amd = get_current_data(cost_amd.set_index(['map2', 'map3']), global_index, current_month)[
+            current_month].reset_index()
+        curr_cost_ukpf = get_current_data(cost_ukpf.set_index('Наименование показателя'), global_index, current_month)[
+            current_month].reset_index()
+        curr_cost_mpf = get_current_data(cost_mpf.set_index('Наименование показателя'), global_index, current_month)[
+            current_month].reset_index()
+        curr_adm_cost_AMP = get_current_data(adm_cost_AMP.set_index('ОАР АМП'), global_index, current_month)[
+            current_month].reset_index()
+        curr_adm_cost_AMD = get_current_data(adm_cost_AMD.set_index('ОАР АМД'), global_index, current_month)[
+            current_month].reset_index()
+
+        #         блок продажи
+        stock = template_for_ss_sku[['Артикул', 'канал']].copy()
+
+        def func(x, df, col):
+            return df[(df['канал'] == x['канал']) & (df['Артикул'] == x['Артикул'])][col].sum()
+
+        stock['Объем кг'] = stock.apply(lambda x: func(x, curr_budj, 'Кол-во'), axis=1)
+
+        stock['Цена тг/кг'] = stock.apply(lambda x: func(x, curr_budj, 'Сумма'), axis=1) / stock['Объем кг']
+        stock = stock.set_index(['Артикул', 'канал'])
+
+        ml = pd.MultiIndex.from_tuples([('Продажи', x) for x in stock.columns])
+        stock.columns = ml
+
+        #         блок себестоимость
+
+        sebes = template_for_ss_sku[['Артикул', 'канал']].copy()
+        current_rash_AMD = ost_AMD.set_index('Артикул')['Расход'][current_month].copy().reset_index()
+        current_rash_AMP = ost_AMP_d.set_index('Артикул')['Расход'][current_month].copy().reset_index()
+
+        all_ = current_rash_AMD.append(current_rash_AMP)
+
+        cols_sum = []
+        for col in all_.set_index('Артикул').columns:
+
+            if col != 'Объем кг' and col.find('Итого') == -1:
+                def func(x, df, col__):
+                    return df[df['Артикул'] == x['Артикул']][col__].sum()
+
+                sebes[col] = sebes.apply(lambda x: func(x, all_, col), axis=1)
+                cols_sum.append(col)
+
+        sebes['Итого тг/кг'] = sebes[cols_sum].sum(axis=1)
+        sebes = sebes.set_index(['Артикул', 'канал'])
+
+        ml = pd.MultiIndex.from_tuples([('Себестоимость', x) for x in sebes.columns])
+        sebes.columns = ml
+
+        stock_sebes = pd.concat([stock, sebes], axis=1)
+        stock_sebes = stock_sebes.reset_index()
         #
         # #         Блок расходы по реализации
         #
@@ -160,7 +160,7 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
         #                                                                                                     stock_sebes,
         #                                                                                                     curr_cost_amd,
         #                                                                                                     x['канал'][
-        #                                                                                                         0],
+        #                  stock_sebes                                                                                       0],
         #                                                                                                     'Логистика'),
         #                                                                                      axis=1)
         #
