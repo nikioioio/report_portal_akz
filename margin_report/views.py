@@ -34,7 +34,7 @@ def upload_files(request):
     #     # raise TypeError('hi')
     # except Exception as e:
     #     return HttpResponse(e.args,status=500)
-
+    pool = Pool(processes=2)
     if request.method == 'POST':
         try:
 
@@ -81,19 +81,21 @@ def upload_files(request):
                     (df_koef_cen, 'Лист1', 0, int(year_), int(month_)),
                     (df_ost_mpf, 'Sheet1', 'ost_nach', int(year_), int(month_))]
 
-                pool = Pool(processes=4)
+
+
                 df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
                 df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
                 global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
-                pool.close()
 
-                pool = Pool(processes=2)
+
+
+
                 arrs_get_ssmp = [(df_list_mpf, int(month_), global_index, 'МПФ', int(year_)),
                                  (df_list_ukpf, int(month_), global_index, 'УКПФ', int(year_))]
 
                 ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
 
-                pool.close()
+
 
                 prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
 
@@ -106,9 +108,9 @@ def upload_files(request):
                                         (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
                                         (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
 
-                pool = Pool(processes=2)
+
                 df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
-                pool.close()
+
 
                 ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
                                                                                            ost_UKPF,
@@ -123,9 +125,9 @@ def upload_files(request):
                                       (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
                                       (df_amort, 'Амортизация', 0, int(year_), int(month_))]
 
-                pool = Pool(processes=2)
+
                 df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
-                pool.close()
+
 
                 ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
                                                                                                        budj_AMD,
@@ -148,7 +150,7 @@ def upload_files(request):
                                       (df_amp_and_amd, 'ОАР АМП', 0, int(year_), int(month_)),
                                       (df_amp_and_amd, 'ОАР АМД', 0, int(year_), int(month_))]
 
-                pool = Pool(processes=2)
+
                 df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
                 pool.close()
 
@@ -156,7 +158,7 @@ def upload_files(request):
 
 
             except Exception as e:
-
+                pool.close()
                 print(e)
                 logger.error(str(traceback.format_exc()).encode())
                 return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
