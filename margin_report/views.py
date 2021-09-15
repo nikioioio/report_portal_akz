@@ -144,16 +144,16 @@ def upload_files(request):
                 #
                 # #     get_ss_sku
                 #
-                # arrs_for_ss_sku_itog = [(df_amp_and_amd, 'РР АМД', 0, int(year_), int(month_)),
-                #                       (df_amp_and_amd, 'РР АМП', 0, int(year_), int(month_)),
-                #                       (df_mpf, 'РР', 0, int(year_), int(month_)),
-                #                       (df_ukpf, 'РР', 0, int(year_), int(month_)),
-                #                       (df_amp_and_amd, 'ОАР АМП', 0, int(year_), int(month_)),
-                #                       (df_amp_and_amd, 'ОАР АМД', 0, int(year_), int(month_))]
-                #
-                #
-                # df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
-                # pool.close()
+                arrs_for_ss_sku_itog = [(df_amp_and_amd, 'РР АМД', 0, int(year_), int(month_)),
+                                      (df_amp_and_amd, 'РР АМП', 0, int(year_), int(month_)),
+                                      (df_mpf, 'РР', 0, int(year_), int(month_)),
+                                      (df_ukpf, 'РР', 0, int(year_), int(month_)),
+                                      (df_amp_and_amd, 'ОАР АМП', 0, int(year_), int(month_)),
+                                      (df_amp_and_amd, 'ОАР АМД', 0, int(year_), int(month_))]
+
+                pool = Pool(processes=4)
+                df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
+                pool.close()
                 #
                 # ss_sku = get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, int(month_), int(year_), df_list_ss_sku_itog,global_index)
 
