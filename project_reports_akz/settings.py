@@ -24,7 +24,7 @@ from django.core.management.utils import get_random_secret_key
 SECRET_KEY = 'django-insecure-vi7k5&(+022n6zkd-$&=z4e)duho+z9w6*7g=_!9!sf84uga19'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -134,7 +134,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 15242880
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
