@@ -146,6 +146,8 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
 
         # ---------------------------------------------------
 
+
+
         def func(x, df, df1, channel, pr_cost):
             #             if x['канал'][0]=='Кейтеринг':
             prod = x['Продажи']['Объем кг']

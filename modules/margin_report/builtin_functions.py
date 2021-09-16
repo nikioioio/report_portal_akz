@@ -222,7 +222,7 @@ def save_iter_month_xlsx(writer,df,iter_months,name):
         pass
     return writer
 # формирование ответа на фронт с файлом.
-def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d):
+async def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d):
 
     iter_months = [datetime.datetime(year_report, x, calendar.monthrange(year_report, x)[1], 0, 0) for x in
                    range(1, 13)]
@@ -252,7 +252,7 @@ def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,pe
     now = datetime.datetime.now()
     date_for_name_file = now.strftime("%d-%m-%Y %H:%M")
 
-    response = StreamingHttpResponse(output,
+    response = await StreamingHttpResponse(output,
                                      content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = f'attachment; filename=margin ' +date_for_name_file+'.xlsx'
 
