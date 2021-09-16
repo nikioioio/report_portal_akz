@@ -28,7 +28,7 @@ def starting_page(request):
 
 # Прием файлов и расчет
 @csrf_exempt
-async def upload_files(request):
+def upload_files(request):
     # try:
     #     a = 1/0
     #     # raise TypeError('hi')
@@ -171,7 +171,7 @@ async def upload_files(request):
                                      'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
 
-            return await generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
+            return  generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
 
         except MultiValueDictKeyError:
             return HttpResponse('При загрузке Файла произошла ошибка')
