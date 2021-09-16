@@ -159,12 +159,12 @@ def input_proc_packaging(df, arr_priznak, date, filter_, df2, arr_priznak1, filt
     return df2
 
 
-def save_iter_month_xlsx(directory_out, df, months, name):
-    try:
-        for date in months:
-            df[date].to_excel(directory_out + str(date.month) + name)
-    except KeyError:
-        pass
+def save_iter_month_xlsx(directory_out,df,months,name):
+    for date in months:
+        try:
+            df[date].to_excel(directory_out+str(date.month)+name)
+        except KeyError:
+            pass
 
 
 # Функция Реструктурирует таблицу с мультиколонками  для того чтобы pandas воспринимал индекс
