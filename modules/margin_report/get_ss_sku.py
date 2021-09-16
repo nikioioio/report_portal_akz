@@ -65,7 +65,7 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
                                                      ), axis=1)
 
     iter_months = [datetime.datetime(year_report, x, calendar.monthrange(year_report, x)[1], 0, 0) for x in
-                   range(1, 13)]
+                   range(month, month+1)]
 
     for ind___, current_month in enumerate(iter_months):
 
@@ -320,7 +320,7 @@ def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month
 
         cons_table_dict[current_month] = stock_sebes
 
-        if ind___ + 1 == month:
-            return cons_table_dict
+        # if ind___ + 1 == month:
+        return cons_table_dict
 
 #         return template_for_ss_sku.set_index(['Артикул','канал','Наименование','продукт'])
