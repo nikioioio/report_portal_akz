@@ -159,12 +159,12 @@ def input_proc_packaging(df, arr_priznak, date, filter_, df2, arr_priznak1, filt
     return df2
 
 
-def save_iter_month_xlsx(directory_out,df,months,name):
-    for date in months:
-        try:
-            df[date].to_excel(directory_out+str(date.month)+name)
-        except KeyError:
-            pass
+# def save_iter_month_xlsx(directory_out, df, months, name):
+#     try:
+#         for date in months:
+#             df[date].to_excel(directory_out + str(date.month) + name)
+#     except KeyError:
+#         pass
 
 
 # Функция Реструктурирует таблицу с мультиколонками  для того чтобы pandas воспринимал индекс
@@ -215,11 +215,11 @@ def dict_keys_free(col_1_val, mapping, arr_cols):
     return cons.drop_duplicates()
 
 def save_iter_month_xlsx(writer,df,iter_months,name):
-    try:
-        for date in iter_months:
+    for date in iter_months:
+        try:
             df[date].to_excel(writer, sheet_name=  str(date.month)+name)
-    except KeyError:
-        pass
+        except KeyError:
+            pass
     return writer
 # формирование ответа на фронт с файлом.
 def generate_exlx_for_ajax(year_report,ost_MPF, ost_UKPF, prod_MPF, prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d):
