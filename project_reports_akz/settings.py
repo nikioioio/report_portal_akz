@@ -159,7 +159,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'debug.log'
+            'filename': '../debug_report_portal.log'
         }
     },
     'loggers': {
