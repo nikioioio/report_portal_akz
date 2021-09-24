@@ -20,11 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("", include("main_app.urls")),
-    path("margin_report/", include("margin_report.urls")),
-    path("plain_test/", include("plain_test.urls")),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-
-
+                  path('admin/', admin.site.urls),
+                  path("", include("main_app.urls")),
+                  path("margin_report/", include("margin_report.urls")),
+                  path("ukpf_test/", include("ukpf_test.urls")),
+                  path("mpf_test/", include("mpf_test.urls")),
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -34,7 +34,8 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'margin_report',
     'main_app',
-    'plain_test',
+    'ukpf_test',
+    'mpf_test',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

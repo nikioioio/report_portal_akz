@@ -24,8 +24,8 @@ import sys
 
 
 def starting_page(request):
-    title='Модель производственного планирования ЗПП'
-    return render(request, "plain_test/index.html", context={'title': title})
+    title='Модель производственного планирования ЗПП УКПФ'
+    return render(request, "ukpf_test/index.html", context={'title': title})
 
 
 @csrf_exempt
@@ -277,7 +277,7 @@ def refresh(request):
     zakaz=request.FILES['zakaz']
     df1=pd.read_csv(uboi)
     df2=pd.read_csv(zakaz)
-    df=pd.read_csv('plain_test/планирование_зпп.csv')
+    df=pd.read_csv('mpf_test/планирование_зпп.csv')
     df=df.round(1)
     res=df_to_json(df)
     return JsonResponse(res)
@@ -286,7 +286,7 @@ def refresh(request):
 @csrf_exempt
 def update(request):
     if request.method == 'POST':
-        df=pd.read_csv('plain_test/планирование_зпп.csv', index_col=0)
+        df=pd.read_csv('mpf_test/планирование_зпп.csv', index_col=0)
         df1_1=df.iloc[:, [6, 2, 1, 8, 3]]
         js_orig=df_to_json(df1_1)
         cb=js_orig['ЦБ'][0]
@@ -339,7 +339,7 @@ def test_get_json(request):
         # js = request.POST['json']
         # json_obg = json.loads(js)
         # print(json_obg)
-        df=pd.read_csv('plain_test/планирование_зпп2.csv')
+        df=pd.read_csv('mpf_test/планирование_зпп2.csv')
         output=BytesIO()
 
         # Возврат на frontend файла excel
@@ -370,7 +370,7 @@ def test_get_json_2(request):
         # js = request.POST['json']
         # json_obg = json.loads(js)
         # print(json_obg)
-        df=pd.read_csv('plain_test/отчет.csv')
+        df=pd.read_csv('mpf_test/отчет.csv')
         output=BytesIO()
 
         # Возврат на frontend файла excel

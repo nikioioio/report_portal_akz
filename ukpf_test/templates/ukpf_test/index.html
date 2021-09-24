@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "ukpf_test/main.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <ol class="bullet">
+            <li><input type="file"  id="ctrl" accept=".csv"/></li>
+            <li><input type="file"  id="ctrl2" accept=".csv"/></li>
+    {#        <li><input type="file"  id="ctrl2" webkitdirectory directory multiple/></li>#}
+    {#        <li><input id="month_" placeholder="Выбор месяца для отчета" type="number"></li>#}
+    {#        <li><input id="year_" placeholder="Выбор года для отчета"  type="number"></li>#}
+
+
+    </ol>
+    <button id="btn_test_arr" class="border-button" onclick="get_arr()">Расчитать</button>
+
+    <div id="content">
+        <div id="left">
+            {#            <button>sdd</button>#}
+            <button id="per_ch">Пересчитать</button>
+            <button id="sb_ch">Сбросить</button>
+            <button id="get_table">Получить отчет</button>
+            <button id="download_res">Получить результат</button>
+            <button id="download_table">Скачать отчет</button>
+        </div>
+
+        <div id="right">
+{#            <button id="per_pr">Пересчитать продукты</button>#}
+{#            <button id="sb_pr">Сбросить продукты</button>#}
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="{% static "./mpf_test/js/test.js" %}"></script>
+{% endblock %}
+
+
+
+
