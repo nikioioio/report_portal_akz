@@ -34,7 +34,7 @@ def upload_files(request):
     #     # raise TypeError('hi')
     # except Exception as e:
     #     return HttpResponse(e.args,status=500)
-    pool = Pool(processes=4)
+    pool = Pool(processes=2)
     if request.method == 'POST':
         try:
 
