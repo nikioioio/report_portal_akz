@@ -111,7 +111,9 @@ function get_val() {
     let xhr = new XMLHttpRequest();
     xhr.open('POST', 'upl/');
     // xhr.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    xhr.responseType = 'arraybuffer';
+
+    // xhr.responseType = 'arraybuffer';
+    xhr.responseType = 'json';
     $('#circularG').css({'display': 'block'})
     $('#btn_send').attr('disabled', true)
     xhr.onload = function (e) {
@@ -119,21 +121,22 @@ function get_val() {
         $('#circularG').css({'display': 'none'})
         $('#btn_send').removeAttr('disabled')
         if (this.status == 200) {
-            let disposition = this.getResponseHeader('Content-Disposition')
-
-            if (disposition && disposition.indexOf('attachment') !== -1) {
-                let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                let matches = filenameRegex.exec(disposition);
-                if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-            }
-            var blob = new Blob([this.response], {type: 'application/vnd.ms-excel'});
-            var downloadUrl = URL.createObjectURL(blob);
-            var a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            alert('Отчет сформирован')
+            obj.firstIteration = this.response;
+            // let disposition = this.getResponseHeader('Content-Disposition')
+            //
+            // if (disposition && disposition.indexOf('attachment') !== -1) {
+            //     let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            //     let matches = filenameRegex.exec(disposition);
+            //     if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+            // }
+            // var blob = new Blob([this.response], {type: 'application/vnd.ms-excel'});
+            // var downloadUrl = URL.createObjectURL(blob);
+            // var a = document.createElement("a");
+            // a.href = downloadUrl;
+            // a.download = filename;
+            // document.body.appendChild(a);
+            // a.click();
+            // alert('Отчет сформирован')
         } else {
 
             function arrayBufferToString(buffer, encoding) {
@@ -172,3 +175,125 @@ function get_val() {
 
     xhr.send(data1);
 }
+
+
+
+function secondIteration(){
+    var data1 = new FormData()
+    var control = document.getElementById("ctrl");
+    var arr = control.files
+    for (index = 0; index < arr.length; index++) {
+        if (arr[index].name == "АМП и АМД.xlsx") {
+            data1.append('amp_and_amd', arr[index])
+        } else if (arr[index].name == "МПФ.xlsx") {
+            data1.append('МПФ', arr[index])
+        } else if (arr[index].name == "УКПФ.xlsx") {
+            data1.append('УКПФ', arr[index])
+        } else if (arr[index].name == "Mapping.xlsx") {
+            data1.append('mapping', arr[index])
+        } else if (arr[index].name == "Коэффициент ценности.xlsx") {
+            data1.append('koef_cen', arr[index])
+        } else if (arr[index].name == "Остатки на начало года МПФ.xlsx") {
+            data1.append('ost_mpf', arr[index])
+        } else if (arr[index].name == "Остатки на начало года УКПФ.xlsx") {
+            data1.append('ost_ukpf', arr[index])
+        } else if (arr[index].name == "Остатки на начало года АМД.xlsx") {
+            data1.append('ost_amd', arr[index])
+        } else if (arr[index].name == "Остатки на начало года АМП.xlsx") {
+            data1.append('ost_amp', arr[index])
+        } else if (arr[index].name == "Амортизация.xlsx") {
+            data1.append('amort', arr[index])
+        }
+
+    }
+
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', 'secondIteration/');
+    data1.append('firstIteration', JSON.stringify(obj.firstIteration));
+    xhr.responseType = 'json';
+
+    xhr.onload = function (e) {
+
+        $('#circularG').css({'display': 'none'})
+        $('#btn_send').removeAttr('disabled')
+        if (this.status == 200) {
+            obj.secondIteration = this.response;
+
+        } else {
+
+        }
+    }
+
+    xhr.send(data1);
+}
+
+
+function thirdIteration(){
+    var data1 = new FormData()
+    var control = document.getElementById("ctrl");
+    var arr = control.files
+    for (index = 0; index < arr.length; index++) {
+        if (arr[index].name == "АМП и АМД.xlsx") {
+            data1.append('amp_and_amd', arr[index])
+        } else if (arr[index].name == "МПФ.xlsx") {
+            data1.append('МПФ', arr[index])
+        } else if (arr[index].name == "УКПФ.xlsx") {
+            data1.append('УКПФ', arr[index])
+        } else if (arr[index].name == "Mapping.xlsx") {
+            data1.append('mapping', arr[index])
+        } else if (arr[index].name == "Коэффициент ценности.xlsx") {
+            data1.append('koef_cen', arr[index])
+        } else if (arr[index].name == "Остатки на начало года МПФ.xlsx") {
+            data1.append('ost_mpf', arr[index])
+        } else if (arr[index].name == "Остатки на начало года УКПФ.xlsx") {
+            data1.append('ost_ukpf', arr[index])
+        } else if (arr[index].name == "Остатки на начало года АМД.xlsx") {
+            data1.append('ost_amd', arr[index])
+        } else if (arr[index].name == "Остатки на начало года АМП.xlsx") {
+            data1.append('ost_amp', arr[index])
+        } else if (arr[index].name == "Амортизация.xlsx") {
+            data1.append('amort', arr[index])
+        }
+
+    }
+
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', 'thirdIteration/');
+    data1.append('secondIteration', JSON.stringify(obj.secondIteration));
+    xhr.responseType = 'json';
+
+    xhr.onload = function (e) {
+
+        $('#circularG').css({'display': 'none'})
+        $('#btn_send').removeAttr('disabled')
+        if (this.status == 200) {
+            obj.secondIteration = this.response;
+
+        } else {
+
+        }
+    }
+
+    xhr.send(data1);
+}
+
+
+
+const obj = {
+    firstIteration:null,
+    secondIteration:null,
+}
+
+
+document.querySelector('#btn_send').addEventListener('click',async ()=> {
+    get_val();
+})
+document.querySelector('#btn_send1').addEventListener('click',async ()=> {
+    secondIteration();
+})
+
+document.querySelector('#btn_send2').addEventListener('click',async ()=> {
+    thirdIteration();
+})

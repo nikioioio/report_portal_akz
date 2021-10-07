@@ -1,4 +1,6 @@
 import os
+import numpy as np
+import json
 import logging
 from io import StringIO, BytesIO
 from modules.margin_report.module_ssmp import get_ssmp_ukpf
@@ -18,13 +20,47 @@ from modules.margin_report.builtin_functions import generate_exlx_for_ajax,gener
 import traceback
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
-
 import base64
+
+def toBase64_arr(arr):
+    t = []
+    for i, df in enumerate(range(len(arr))):
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        df = arr[i]
+        df.to_excel(writer, sheet_name='test')
+        writer.save()
+        output = base64.b64encode(output.getvalue()).decode()
+        t.append(output)
+    return t
+
+def fromBase64to_arr(base64Arr, dict_pars):
+    t = []
+    for i, df in enumerate(range(len(base64Arr))):
+        if dict_pars[i] == 'ost_nach':
+            df = pd.read_excel(base64.b64decode(base64Arr[i]),index_col=0)
+            t.append(df)
+        elif dict_pars[i] == 0:
+            df = pd.read_excel(base64.b64decode(base64Arr[i]))
+            t.append(df)
+        else:
+            df = pd.read_excel(base64.b64decode(base64Arr[i]), header=dict_pars[i])
+            t.append(df)
+    return t
+
+def replaceUnnamedColumns(df):
+    for i, columns_old in enumerate(df.columns.levels):
+        columns_new = np.where(columns_old.str.contains('Unnamed'), '', columns_old)
+        df.rename(columns=dict(zip(columns_old, columns_new)), level=i, inplace=True)
+    return df
+
 logger = logging.getLogger(__name__)
 # Показ стартовой страницы по маржинальности
 def starting_page(request):
     title = 'Margin Report'
     return render(request, "margin_report/index.html", context={'title': title})
+
+
 
 # Прием файлов и расчет
 @csrf_exempt
@@ -51,7 +87,7 @@ def upload_files(request):
             year_ = request.POST['year']
             month_ = request.POST['month']
 
-            factries = ['УКПФ.xlsx', 'МПФ.xlsx']
+
             dict_pars = [['Продажи ГП', 0],
                          ['Остатки', 0],
                          ['Адм', 0],
@@ -84,77 +120,7 @@ def upload_files(request):
                 pool = Pool(processes=4)
                 df_list_ukpf = pool.map(get_files, arrs_input_func_ukpf)
                 df_list_mpf = pool.map(get_files, arrs_input_func_mpf)
-                global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
 
-
-
-
-                arrs_get_ssmp = [(df_list_mpf, int(month_), global_index, 'МПФ', int(year_)),
-                                 (df_list_ukpf, int(month_), global_index, 'УКПФ', int(year_))]
-
-                ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
-
-                # pool.close()
-
-                prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
-
-                prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
-                # amd_sebes
-                arrs_for_amd_sebes = [  (df_ost_amd, 'Sheet1', 'ost_nach', int(year_), int(month_)),
-                                        (df_amp_and_amd, 'Продажи бюдж', [0, 1], int(year_), int(month_)),
-                                        (df_amp_and_amd, 'Остатки АМД', [0, 1], int(year_), int(month_)),
-                                        (df_amp_and_amd, 'Отчет СС АМП', [0, 1, 2], int(year_), int(month_)),
-                                        (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
-                                        (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
-
-                # pool = Pool(processes=4)
-                df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
-                # pool.close()
-
-                ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
-                                                                                           ost_UKPF,
-                                                                                           prod_MPF,
-                                                                                           ost_MPF,
-                                                                                           int(year_),
-                                                                                           df_list_amd,
-                                                                                           int(month_),
-                                                                                           global_index)
-                # # get_ss_amp
-                arrs_for_amp_sebes = [(df_ost_amp, 'Sheet1', 'ost_nach', int(year_), int(month_)),
-                                      (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
-                                      (df_amort, 'Амортизация', 0, int(year_), int(month_))]
-
-                # pool = Pool(processes=4)
-                df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
-                # pool.close()
-                #
-                #
-                ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
-                                                                                                       budj_AMD,
-                                                                                                       global_index,
-                                                                                                       int(year_),
-                                                                                                       bolv,
-                                                                                                       ost_AMD,
-                                                                                                       sebes_amp,
-                                                                                                       df_list_amp,
-                                                                                                       ost_AMP,
-                                                                                                       sebes_amp_new)
-                #
-                #
-                # #     get_ss_sku
-                #
-                arrs_for_ss_sku_itog = [(df_amp_and_amd, 'РР АМД', 0, int(year_), int(month_)),
-                                      (df_amp_and_amd, 'РР АМП', 0, int(year_), int(month_)),
-                                      (df_mpf, 'РР', 0, int(year_), int(month_)),
-                                      (df_ukpf, 'РР', 0, int(year_), int(month_)),
-                                      (df_amp_and_amd, 'ОАР АМП', 0, int(year_), int(month_)),
-                                      (df_amp_and_amd, 'ОАР АМД', 0, int(year_), int(month_))]
-
-                # pool = Pool(processes=4)
-                df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
-
-                #
-                ss_sku = get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, int(month_), int(year_), df_list_ss_sku_itog,global_index)
 
                 pool.close()
 
@@ -169,11 +135,200 @@ def upload_files(request):
                 return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
                                      'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
-
-            return  generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
+            return JsonResponse({'df_list_ukpf':toBase64_arr(df_list_ukpf),
+                                 'df_list_mpf': toBase64_arr(df_list_mpf),
+                                 'month_':month_,
+                                 'year_':year_})
+            # return  generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
 
         except MultiValueDictKeyError:
             return HttpResponse('При загрузке Файла произошла ошибка')
+
+@csrf_exempt
+def secondIteration(request):
+    if request.method == 'POST':
+        try:
+            dict_pars = [0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         [0, 1, 2],
+                         0,
+                         0,
+                         0,
+                         [0, 1],
+                         [0, 1],
+                         0,
+                         'ost_nach'
+                         ]
+
+
+
+            global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
+            df_amp_and_amd = request.FILES['amp_and_amd']
+            df_ost_amd = request.FILES['ost_amd']
+            df_ost_amp = request.FILES['ost_amp']
+            df_amort = request.FILES['amort']
+            df_mapping = request.FILES['mapping']
+            df_mpf = request.FILES['МПФ']
+            df_ukpf = request.FILES['УКПФ']
+
+
+            firstIteration = request.POST['firstIteration']
+
+            jsonLoad = json.loads(firstIteration)
+
+            df_list_ukpf = fromBase64to_arr(jsonLoad['df_list_ukpf'], dict_pars)
+            df_list_mpf = fromBase64to_arr(jsonLoad['df_list_mpf'], dict_pars)
+            month_ = jsonLoad['month_']
+            year_ = jsonLoad['year_']
+
+            arrs_get_ssmp = [(df_list_mpf, int(month_), global_index, 'МПФ', int(year_)),
+                             (df_list_ukpf, int(month_), global_index, 'УКПФ', int(year_))]
+
+            pool = Pool(processes=4)
+
+            ss_mp = pool.map(get_ssmp_ukpf, arrs_get_ssmp)
+
+            # pool.close()
+
+            prod_MPF, ost_MPF, per_1_mpf, per_2_mpf = ss_mp[0]
+
+            prod_UKPF, ost_UKPF, per_1_UKPF, per_2_UKPF = ss_mp[1]
+            # amd_sebes
+            arrs_for_amd_sebes = [  (df_ost_amd, 'Sheet1', 'ost_nach', int(year_), int(month_)),
+                                    (df_amp_and_amd, 'Продажи бюдж', [0, 1], int(year_), int(month_)),
+                                    (df_amp_and_amd, 'Остатки АМД', [0, 1], int(year_), int(month_)),
+                                    (df_amp_and_amd, 'Отчет СС АМП', [0, 1, 2], int(year_), int(month_)),
+                                    (df_amp_and_amd, 'Остатки АМП', 0, int(year_), int(month_)),
+                                    (df_amp_and_amd, 'Для СС АМП', [0, 1], int(year_), int(month_))]
+
+            # pool = Pool(processes=4)
+            df_list_amd = pool.map(get_files, arrs_for_amd_sebes)
+            # pool.close()
+
+            ost_AMD, budj_AMD, bolv, sebes_amp, ost_AMP, sebes_amp_new = get_amd_sebes(prod_UKPF,
+                                                                                       ost_UKPF,
+                                                                                       prod_MPF,
+                                                                                       ost_MPF,
+                                                                                       int(year_),
+                                                                                       df_list_amd,
+                                                                                       int(month_),
+                                                                                       global_index)
+
+            pool.close()
+
+
+
+
+        except Exception as e:
+            print(e)
+            logger.error(str(traceback.format_exc()).encode())
+            return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
+                                 'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
+
+
+
+        return JsonResponse({'month_':month_,
+                            'year_':year_,
+                            'budj_AMD':toBase64_arr(list([budj_AMD])),
+                             'bolv': toBase64_arr(list([bolv])),
+                             'ost_AMD':toBase64_arr(list([ost_AMD])),
+                             'sebes_amp': toBase64_arr(list([sebes_amp])),
+                             'ost_AMP': toBase64_arr(list([ost_AMP])),
+                             'sebes_amp_new':toBase64_arr(list([sebes_amp_new]))})
+
+
+
+
+
+@csrf_exempt
+def thirdIteration(request):
+
+    if request.method == 'POST':
+        try:
+
+            global_index = ['Артикул', 'Продукция', 'Номенклатура', 'Канал', 'Тип']
+
+
+            df_ost_amp = request.FILES['ost_amp']
+            df_mapping = request.FILES['mapping']
+            df_amort = request.FILES['amort']
+            df_amp_and_amd = request.FILES['amp_and_amd']
+            df_mpf = request.FILES['МПФ']
+            df_ukpf = request.FILES['УКПФ']
+
+            secondIteration = request.POST['secondIteration']
+            jsonLoad = json.loads(secondIteration)
+            month_ = jsonLoad['month_']
+            year_ = jsonLoad['year_']
+
+            budj_AMD = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['budj_AMD'], [[0,1,2]])[0])
+
+            print(budj_AMD)
+            bolv = fromBase64to_arr(jsonLoad['bolv'], [[0]])[0]
+            ost_AMD = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['ost_AMD'], [[0,1,2]])[0])
+            sebes_amp = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['sebes_amp'], [[0,1,2]])[0])
+            ost_AMP = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['sebes_amp'], [[0,1]])[0])
+            sebes_amp_new = (fromBase64to_arr(jsonLoad['sebes_amp_new'], [[0,1,2,3]])[0])
+
+            # # get_ss_amp
+            arrs_for_amp_sebes = [(df_ost_amp, 'Sheet1', 'ost_nach', int(year_), int(month_)),
+                                  (df_mapping, 'Mapping', [0, 1], int(year_), int(month_)),
+                                  (df_amort, 'Амортизация', 0, int(year_), int(month_))]
+
+            pool = Pool(processes=4)
+            df_list_amp = pool.map(get_files, arrs_for_amp_sebes)
+            # pool.close()
+            #
+            #
+            ost_AMP_d, template_for_ss_sku, mapping, zak_u_amd_amp, sebes_real_pr_AMD = get_ss_amp(int(month_),
+                                                                                                   budj_AMD,
+                                                                                                   global_index,
+                                                                                                   int(year_),
+                                                                                                   bolv,
+                                                                                                   ost_AMD,
+                                                                                                   sebes_amp,
+                                                                                                   df_list_amp,
+                                                                                                   ost_AMP,
+                                                                                                   sebes_amp_new)
+            #
+            #
+            # #     get_ss_sku
+            #
+            arrs_for_ss_sku_itog = [(df_amp_and_amd, 'РР АМД', 0, int(year_), int(month_)),
+                                    (df_amp_and_amd, 'РР АМП', 0, int(year_), int(month_)),
+                                    (df_mpf, 'РР', 0, int(year_), int(month_)),
+                                    (df_ukpf, 'РР', 0, int(year_), int(month_)),
+                                    (df_amp_and_amd, 'ОАР АМП', 0, int(year_), int(month_)),
+                                    (df_amp_and_amd, 'ОАР АМД', 0, int(year_), int(month_))]
+
+            # pool = Pool(processes=4)
+            df_list_ss_sku_itog = pool.map(get_files, arrs_for_ss_sku_itog)
+
+            #
+            ss_sku = get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, int(month_), int(year_),
+                                df_list_ss_sku_itog, global_index)
+
+            pool.close()
+
+
+
+
+        except Exception as e:
+            print(e)
+            logger.error(str(traceback.format_exc()).encode())
+            return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
+                                 'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
+
+
+
+    return JsonResponse({'secondIteration':''})
 
 
 
