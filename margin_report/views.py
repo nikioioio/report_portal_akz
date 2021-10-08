@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import datetime
 import json
 import logging
 from io import StringIO, BytesIO
@@ -21,7 +22,7 @@ import traceback
 # Create your views here.
 from modules.margin_report.perralel_read_files import get_files
 import base64
-
+# Функция превращает массив df в кодировку для отправки на фронт
 def toBase64_arr(arr):
     t = []
     for i, df in enumerate(range(len(arr))):
@@ -33,7 +34,7 @@ def toBase64_arr(arr):
         output = base64.b64encode(output.getvalue()).decode()
         t.append(output)
     return t
-
+# Функция превращает массив кодировок в df
 def fromBase64to_arr(base64Arr, dict_pars):
     t = []
     for i, df in enumerate(range(len(base64Arr))):
@@ -47,12 +48,71 @@ def fromBase64to_arr(base64Arr, dict_pars):
             df = pd.read_excel(base64.b64decode(base64Arr[i]), header=dict_pars[i])
             t.append(df)
     return t
+# Функция превращает словарь df в кодировку для отправки на фронт
+def toBase64_dict(dict_):
+    for key in dict_.keys():
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        df = dict_[key]
+        df.to_excel(writer, sheet_name='test')
+        writer.save()
+        output = base64.b64encode(output.getvalue()).decode()
+        dict_[key] = output
+    return dict_
+# Функция убирает unnamed наименования столбцов И меняет их на ''
+def replace_unnamed(df):
+    cons = []
+    col_list = list(df.columns)
+    for i, val in enumerate(col_list):
+        lst = list(col_list[i])
+        for j, val in enumerate(lst):
+            lst[j] = str(lst[j])
+            try:
+                if lst[j].find('Unnamed')!=-1:
+                    lst[j]=''
+            except AttributeError:
+                pass
 
-def replaceUnnamedColumns(df):
-    for i, columns_old in enumerate(df.columns.levels):
-        columns_new = np.where(columns_old.str.contains('Unnamed'), '', columns_old)
-        df.rename(columns=dict(zip(columns_old, columns_new)), level=i, inplace=True)
+        cons.append(tuple(lst))
+
+    df.columns = pd.MultiIndex.from_tuples(cons)
+    df = df.set_index('Артикул').drop('',axis = 1)
+
+    cons = []
+    col_list = list(df.columns)
+    for i, val in enumerate(col_list):
+        lst = list(col_list[i])
+        for j, val in enumerate(lst):
+            try:
+                lst[j] = datetime.datetime.strptime(lst[j], '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                pass
+
+        cons.append(tuple(lst))
+
+    df.columns = pd.MultiIndex.from_tuples(cons)
+
     return df
+
+# Функция зименяет ключи словаря в формате даты на тип строки для преедачи на клиенту
+def replaceDatetimeKeysToStr(dict_):
+    for key in dict_.copy():
+        dict_[str(key)] = dict_.pop(key)
+    return dict_
+
+
+# Функция зименяет ключи словаря в формате строки на тип даты
+def replaceStrTODatetime(dict_):
+    for key in dict_.copy():
+        dict_[datetime.datetime.strptime(key, '%Y-%m-%d %H:%M:%S')] = dict_.pop(key)
+    return dict_
+
+# Функция превращает словарь из кодировке base 64 в словарь с df
+def fromBase64to_dict(dict_):
+    for key in dict_:
+            df = pd.read_excel(base64.b64decode(dict_[key]))
+            dict_[key] = df
+    return dict_
 
 logger = logging.getLogger(__name__)
 # Показ стартовой страницы по маржинальности
@@ -73,7 +133,6 @@ def upload_files(request):
 
     if request.method == 'POST':
         try:
-
             df_amp_and_amd = request.FILES['amp_and_amd']
             df_mpf = request.FILES['МПФ']
             df_ukpf = request.FILES['УКПФ']
@@ -130,7 +189,6 @@ def upload_files(request):
 
             except Exception as e:
                 pool.close()
-                print(e)
                 logger.error(str(traceback.format_exc()).encode())
                 return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
                                      'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
@@ -141,8 +199,10 @@ def upload_files(request):
                                  'year_':year_})
             # return  generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
 
-        except MultiValueDictKeyError:
-            return HttpResponse('При загрузке Файла произошла ошибка')
+        except Exception as e:
+            logger.error(str(traceback.format_exc()).encode())
+            return JsonResponse({'error': str(traceback.format_exc()).encode().decode('utf-8', 'ignore'),
+                                 'error1': str(e.args).encode().decode('utf-8', 'ignore')}, status=500)
 
 @csrf_exempt
 def secondIteration(request):
@@ -236,12 +296,20 @@ def secondIteration(request):
 
         return JsonResponse({'month_':month_,
                             'year_':year_,
-                            'budj_AMD':toBase64_arr(list([budj_AMD])),
+                            'budj_AMD':toBase64_arr(list([budj_AMD.reset_index()])),
                              'bolv': toBase64_arr(list([bolv])),
                              'ost_AMD':toBase64_arr(list([ost_AMD])),
-                             'sebes_amp': toBase64_arr(list([sebes_amp])),
+                             'sebes_amp': toBase64_arr(list([sebes_amp.reset_index()])),
                              'ost_AMP': toBase64_arr(list([ost_AMP])),
-                             'sebes_amp_new':toBase64_arr(list([sebes_amp_new]))})
+                             'sebes_amp_new':toBase64_arr(list([sebes_amp_new.reset_index()])),
+                             'ost_MPF': toBase64_arr(list([ost_MPF])),
+                             'ost_UKPF': toBase64_arr(list([ost_UKPF])),
+                             'prod_MPF': replaceDatetimeKeysToStr(toBase64_dict(prod_MPF)),
+                             'prod_UKPF': replaceDatetimeKeysToStr(toBase64_dict(prod_UKPF)),
+                             'per_1_mpf': replaceDatetimeKeysToStr(toBase64_dict(per_1_mpf)),
+                             'per_2_mpf': replaceDatetimeKeysToStr(toBase64_dict(per_2_mpf)),
+                             'per_1_UKPF': replaceDatetimeKeysToStr(toBase64_dict(per_1_UKPF)),
+                             'per_2_UKPF': replaceDatetimeKeysToStr(toBase64_dict(per_2_UKPF))})
 
 
 
@@ -268,14 +336,26 @@ def thirdIteration(request):
             month_ = jsonLoad['month_']
             year_ = jsonLoad['year_']
 
-            budj_AMD = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['budj_AMD'], [[0,1,2]])[0])
+            budj_AMD = replace_unnamed(fromBase64to_arr(jsonLoad['budj_AMD'], [[0,1]])[0])
 
-            print(budj_AMD)
+
             bolv = fromBase64to_arr(jsonLoad['bolv'], [[0]])[0]
-            ost_AMD = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['ost_AMD'], [[0,1,2]])[0])
-            sebes_amp = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['sebes_amp'], [[0,1,2]])[0])
-            ost_AMP = replaceUnnamedColumns(fromBase64to_arr(jsonLoad['sebes_amp'], [[0,1]])[0])
-            sebes_amp_new = (fromBase64to_arr(jsonLoad['sebes_amp_new'], [[0,1,2,3]])[0])
+            ost_AMD = replace_unnamed(fromBase64to_arr(jsonLoad['ost_AMD'], [[0,1,2]])[0]).reset_index()
+            sebes_amp = replace_unnamed(fromBase64to_arr(jsonLoad['sebes_amp'], [[0,1]])[0])
+            ost_AMP = fromBase64to_arr(jsonLoad['ost_AMP'], [[0]])[0]
+            sebes_amp_new = replace_unnamed(fromBase64to_arr(jsonLoad['sebes_amp_new'], [[0,1,2]])[0])
+
+
+            # для  сохранения
+
+            ost_MPF = replace_unnamed(fromBase64to_arr(jsonLoad['ost_MPF'], [[0,1,2]])[0])
+            ost_UKPF = replace_unnamed(fromBase64to_arr(jsonLoad['ost_UKPF'], [[0,1,2]])[0])
+            prod_MPF = fromBase64to_dict(replaceStrTODatetime(jsonLoad['prod_MPF']))
+            prod_UKPF = fromBase64to_dict(replaceStrTODatetime(jsonLoad['prod_UKPF']))
+            per_1_mpf = fromBase64to_dict(replaceStrTODatetime(jsonLoad['per_1_mpf']))
+            per_2_mpf = fromBase64to_dict(replaceStrTODatetime(jsonLoad['per_2_mpf']))
+            per_1_UKPF = fromBase64to_dict(replaceStrTODatetime(jsonLoad['per_1_UKPF']))
+            per_2_UKPF = fromBase64to_dict(replaceStrTODatetime(jsonLoad['per_2_UKPF']))
 
             # # get_ss_amp
             arrs_for_amp_sebes = [(df_ost_amp, 'Sheet1', 'ost_nach', int(year_), int(month_)),
@@ -328,7 +408,7 @@ def thirdIteration(request):
 
 
 
-    return JsonResponse({'secondIteration':''})
+        return  generate_exlx_for_ajax(int(year_),ost_MPF,ost_UKPF,prod_MPF,prod_UKPF,per_1_mpf,per_2_mpf,per_1_UKPF, per_2_UKPF,ss_sku,zak_u_amd_amp,sebes_real_pr_AMD,ost_AMD,ost_AMP_d)
 
 
 

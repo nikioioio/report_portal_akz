@@ -58,7 +58,7 @@ input {
 }
 
 .border-button {
-	width:100%;
+	width:85%;
     text-decoration: none;
     display: inline-block;
     padding: 20px 30px;
@@ -119,7 +119,7 @@ input {
 }
 
 .trace{
-    font-size: 20px;
+    font-size: 30px;
     color: #f05d22;
     padding-top: 5px;
 }

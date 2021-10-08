@@ -1,6 +1,6 @@
 //В данном модуле  происходит возаимодействие с backend отчета
 function get_val() {
-
+    $('#one_').html('Выполняется!!!')
     //удаляем стэк если он есть
     $(".trace").remove()
     //проверка на незаполненные параметры
@@ -116,55 +116,53 @@ function get_val() {
     xhr.responseType = 'json';
     $('#circularG').css({'display': 'block'})
     $('#btn_send').attr('disabled', true)
+    $('#btn_send1').attr('disabled', true)
+    $('#btn_send2').attr('disabled', true)
+    $('#ctrl').attr('disabled', true)
+    $('#year_').attr('disabled', true)
+    $('#month_').attr('disabled', true)
+
     xhr.onload = function (e) {
 
         $('#circularG').css({'display': 'none'})
-        $('#btn_send').removeAttr('disabled')
+        $('#btn_send1').removeAttr('disabled')
         if (this.status == 200) {
+            $('#one_').html('Завершено.')
             obj.firstIteration = this.response;
-            // let disposition = this.getResponseHeader('Content-Disposition')
-            //
-            // if (disposition && disposition.indexOf('attachment') !== -1) {
-            //     let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            //     let matches = filenameRegex.exec(disposition);
-            //     if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-            // }
-            // var blob = new Blob([this.response], {type: 'application/vnd.ms-excel'});
-            // var downloadUrl = URL.createObjectURL(blob);
-            // var a = document.createElement("a");
-            // a.href = downloadUrl;
-            // a.download = filename;
-            // document.body.appendChild(a);
-            // a.click();
-            // alert('Отчет сформирован')
+
         } else {
 
-            function arrayBufferToString(buffer, encoding) {
-                return new Promise((resolve, reject) => {
-
-                    var blob = new Blob([buffer], {type: 'text/plain'});
-                    var reader = new FileReader();
-                    reader.readAsText(blob, encoding);
-                    reader.onload = (ev) => {
-                        if (ev.target) {
-                            resolve(ev.target.result)
-                        } else {
-                            reject(new Error('Could not convert string to string!'));
-                        }
-                    }
-                })
-
-            }
-
-            arrayBufferToString(this.response, 'UTF-8').then((r) => {
-                var decoder = new TextDecoder('utf-8')
-                message = JSON.parse(r)['error']
-                message1 = JSON.parse(r)['error1']
-                // console.log(message)
-                $('body').append('<article class="trace">' + message + '</article>').css({'fontsize': '24px'})
-                // $('body').append('<article class="trace">'+message1+'</article>').css({'fontsize':'24px'})
-                // alert(message)
-            })
+            // message = JSON.parse(this.response)['error']
+            // message1 = JSON.parse(this.response)['error1']
+            $('body').append('<article class="trace">' + this.response['error'] + '</article>').css({'fontsize': '50px'})
+            $('#btn_send').attr('disabled', false)
+            $('#one_').html('Завершено с ошибкой')
+            // function arrayBufferToString(buffer, encoding) {
+            //     return new Promise((resolve, reject) => {
+            //
+            //         var blob = new Blob([buffer], {type: 'text/plain'});
+            //         var reader = new FileReader();
+            //         reader.readAsText(blob, encoding);
+            //         reader.onload = (ev) => {
+            //             if (ev.target) {
+            //                 resolve(ev.target.result)
+            //             } else {
+            //                 reject(new Error('Could not convert string to string!'));
+            //             }
+            //         }
+            //     })
+            //
+            // }
+            //
+            // arrayBufferToString(this.response, 'UTF-8').then((r) => {
+            //     var decoder = new TextDecoder('utf-8')
+            //     message = JSON.parse(r)['error']
+            //     message1 = JSON.parse(r)['error1']
+            //     // console.log(message)
+            //     $('body').append('<article class="trace">' + message + '</article>').css({'fontsize': '24px'})
+            //     // $('body').append('<article class="trace">'+message1+'</article>').css({'fontsize':'24px'})
+            //     // alert(message)
+            // })
 
             // Materialize.toast('Invalid data!', 2000)
         }
@@ -179,6 +177,7 @@ function get_val() {
 
 
 function secondIteration(){
+    $('#two_').html('Выполняется!!!')
     var data1 = new FormData()
     var control = document.getElementById("ctrl");
     var arr = control.files
@@ -212,16 +211,20 @@ function secondIteration(){
     xhr.open('POST', 'secondIteration/');
     data1.append('firstIteration', JSON.stringify(obj.firstIteration));
     xhr.responseType = 'json';
-
+    $('#circularG').css({'display': 'block'})
+    $('#btn_send1').attr('disabled', true)
     xhr.onload = function (e) {
 
         $('#circularG').css({'display': 'none'})
-        $('#btn_send').removeAttr('disabled')
+        $('#btn_send2').removeAttr('disabled')
         if (this.status == 200) {
+            $('#two_').html('Завершено.')
             obj.secondIteration = this.response;
 
         } else {
-
+            $('body').append('<article class="trace">' + this.response['error'] + '</article>').css({'fontsize': '50px'})
+            $('#btn_send1').attr('disabled', false)
+            $('#two_').html('Завершено с ошибкой')
         }
     }
 
@@ -230,6 +233,7 @@ function secondIteration(){
 
 
 function thirdIteration(){
+    $('#three_').html('Выполняется!!!')
     var data1 = new FormData()
     var control = document.getElementById("ctrl");
     var arr = control.files
@@ -262,16 +266,60 @@ function thirdIteration(){
     let xhr = new XMLHttpRequest();
     xhr.open('POST', 'thirdIteration/');
     data1.append('secondIteration', JSON.stringify(obj.secondIteration));
-    xhr.responseType = 'json';
-
+    xhr.responseType = 'arraybuffer';
+    $('#circularG').css({'display': 'block'})
+    $('#btn_send2').attr('disabled', true)
     xhr.onload = function (e) {
 
         $('#circularG').css({'display': 'none'})
-        $('#btn_send').removeAttr('disabled')
+        // $('#btn_send').removeAttr('disabled')
         if (this.status == 200) {
-            obj.secondIteration = this.response;
+            let disposition = this.getResponseHeader('Content-Disposition')
 
+            if (disposition && disposition.indexOf('attachment') !== -1) {
+                let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                let matches = filenameRegex.exec(disposition);
+                if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+            }
+            var blob = new Blob([this.response], {type: 'application/vnd.ms-excel'});
+            var downloadUrl = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            alert('Отчет сформирован')
+            $('#three_').html('Завершено')
         } else {
+
+            message = JSON.parse(this.response)['error']
+            message1 = JSON.parse(this.response)['error1']
+            function arrayBufferToString(buffer, encoding) {
+                return new Promise((resolve, reject) => {
+
+                    var blob = new Blob([buffer], {type: 'text/plain'});
+                    var reader = new FileReader();
+                    reader.readAsText(blob, encoding);
+                    reader.onload = (ev) => {
+                        if (ev.target) {
+                            resolve(ev.target.result)
+                        } else {
+                            reject(new Error('Could not convert string to string!'));
+                        }
+                    }
+                })
+
+            }
+            $('#three_').html('Завершено с ошибкой')
+            arrayBufferToString(this.response, 'UTF-8').then((r) => {
+                var decoder = new TextDecoder('utf-8')
+                message = JSON.parse(r)['error']
+                message1 = JSON.parse(r)['error1']
+                // console.log(message)
+                $('body').append('<article class="trace">' + message + '</article>').css({'fontsize': '24px'})
+                // $('body').append('<article class="trace">'+message1+'</article>').css({'fontsize':'24px'})
+                // alert(message)
+            })
 
         }
     }
@@ -286,6 +334,10 @@ const obj = {
     secondIteration:null,
 }
 
+window.addEventListener('DOMContentLoaded',function () {
+    $('#btn_send1').attr('disabled', true)
+    $('#btn_send2').attr('disabled', true)
+});
 
 document.querySelector('#btn_send').addEventListener('click',async ()=> {
     get_val();
