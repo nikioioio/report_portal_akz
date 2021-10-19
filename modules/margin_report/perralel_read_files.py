@@ -53,7 +53,7 @@ def replace_to_correct_datetime_erarh(df,year_report,month_report,sheet_name):
     df.columns = pd.MultiIndex.from_tuples(l)
 
     return df
-
+# функция проверяет все ли заголовки имеют тип даты
 def findind_date(df,year,month):
     iter_months = [datetime.datetime(int(year), x, calendar.monthrange(year, x)[1], 0, 0) for x in
                    range(1, int(month) + 1)]

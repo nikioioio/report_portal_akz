@@ -11,6 +11,7 @@ warnings.filterwarnings('ignore')
 
 # def get_ssmp_ukpf(file_factory, file_mapping, file_coef_cenn, file_ost_nach_g, mon, global_index,filename,year_report): #первоначальный вариант
 # def get_ssmp_ukpf(ar,mon, global_index,filename,year_report): # 2 вызова
+# Функция расчитывает себестоиомсть мясосырья фабрик УКПФ МПФ
 def get_ssmp_ukpf(*args): # параллельный вызов
     ar = args[0][0]
     mon = args[0][1]

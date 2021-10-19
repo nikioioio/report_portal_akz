@@ -5,6 +5,8 @@ from modules.margin_report.builtin_functions import retype_index,retype_multiind
 import warnings
 warnings.filterwarnings('ignore')
 
+# Рассчитывает сбестоимость амд
+
 def get_amd_sebes(prod_UKPF, ost_UKPF, prod_MPF, ost_MPF, year_report, df_list_amd, month,
                   global_index):
 

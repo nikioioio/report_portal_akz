@@ -6,6 +6,7 @@ import warnings
 import numpy as np
 warnings.filterwarnings('ignore')
 
+# Расчитывает итоговую таблицу маржинальность по sku
 def get_ss_sku(template_for_ss_sku, budj_AMD, ost_AMP_d, ost_AMD, mapping, month, year_report,df_list_ss_sku_itog, global_index):
     cons_table_dict = {}
     #     подготовка затрат АМД

@@ -271,11 +271,13 @@ def reminder(df):
     return df
 
 
+
 @csrf_exempt
 def refresh(request):
     uboi=request.FILES['uboi']
     zakaz=request.FILES['zakaz']
     df1=pd.read_csv(uboi)
+
     df2=pd.read_csv(zakaz)
     df=pd.read_csv('mpf_test/планирование_зпп.csv')
     df=df.round(1)
